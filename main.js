@@ -4,14 +4,13 @@ window.C3D = new Canvas3D(document.querySelector('canvas'), 200,200,4,200);
 let arr = [];
 let cubePoints  = [];
 let colors = ['red', 'blue','green','yellow','aqua','magenta','cyan','purple'];
-let enableRotateX = true;
+let enableRotateX = false;
 let enableRotateY = true;
-let enableRotateZ = true;
+let enableRotateZ = false;
 let enableHWLineRen = false;
 let previousTimestamp = null;
-window.C3D.cameraPoint.translate(0,0,-5)
-C3D.rotateX(45);
-C3D.rotateZ(45);
+window.C3D.cameraPoint.translate(0,0,-10)
+
 window.addEventListener('keydown', (e) => {
   // console.log(e);
   if (e.code == 'ArrowLeft') {
@@ -41,18 +40,6 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-const tick = () => {
-  if (enableRotateX)
-    C3D.rotateZ(1);
-  if (enableRotateY)
-    C3D.rotateY(1);
-  if (enableRotateZ)
-    C3D.rotateX(1);
-
-  C3D.clearScreen();
-  C3D.drawPoints(arr);
-  C3D.drawLines(cubeLines, false, enableHWLineRen);
-}
 
 
 const raf = (timestamp) => {
@@ -62,11 +49,11 @@ const raf = (timestamp) => {
   let delta = (timestamp - previousTimestamp)/1000;
   // console.log(delta)
   if (enableRotateX)
-    C3D.rotateZ(10 * delta);
+    C3D.rotateX(10 * delta);
   if (enableRotateY)
     C3D.rotateY(10 * delta);
   if (enableRotateZ)
-    C3D.rotateX(10 * delta);
+    C3D.rotateZ(10 * delta);
 
 try {
   C3D.clearScreen();
@@ -89,13 +76,13 @@ const updatePoints = () => {
   updatePoint(arr[i]);
 }
 
-for (let i = 0; i < 5000; i++) {
+for (let i = 0; i < 500; i++) {
   let point = new Point3D(0,0,0);
   point.setColor(colors[Math.floor(Math.random() * colors.length)]);
   updatePoint(point);
   arr.push(point);
 }
-let cubeCenter = new Point3D(0,3,0);
+let cubeCenter = new Point3D(0,-3,0);
 
 cubePoints.push(new Point3D(-1+cubeCenter.x,1+cubeCenter.y, 1+cubeCenter.z));
 cubePoints.push(new Point3D(-1+cubeCenter.x,1+cubeCenter.y, -1+cubeCenter.z));
@@ -122,10 +109,9 @@ let cubeLines = [
 ]
 
 for (let i =0; i < cubePoints.length; i++) {
-  cubePoints[i].setColor('gray');
+  cubePoints[i].setColor('#f0f');
 }
 
 setInterval(updatePoints, 100);
-// setInterval(tick, 16);
 
 requestAnimationFrame(raf);
