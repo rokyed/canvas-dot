@@ -62,7 +62,6 @@ class Canvas3D {
     let pB = pointB.getRotated2D(this.worldRotation, this.zoom);
 
     if (useHW) {
-      console.log('HW')
       this.drawLineHardware(pA.x,pA.y, pB.x, pB.y, pointA.color);
     } else {
       this.drawLineSoftware(pA.x,pA.y, pB.x, pB.y, pointA.color);
