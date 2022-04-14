@@ -75,17 +75,36 @@ class Point3D {
     let rot = this.rotateAroundX(this.x, this.y, this.z, worldRotation.x);
     rot = this.rotateAroundY(rot.x, rot.y, rot.z, worldRotation.y);
     rot = this.rotateAroundZ(rot.x, rot.y, rot.z, worldRotation.z);
+    try {
+      let rx = this.offsetX + (rot.x / ((rot.z + this.offsetZ)/zoom));
+      let ry =  this.offsetY + (rot.y / ((rot.z + this.offsetZ)/zoom));
 
-    return {
-      x: this.offsetX + (rot.x / ((rot.z + this.offsetZ)/zoom)),
-      y: this.offsetY + (rot.y / ((rot.z + this.offsetZ)/zoom))
+      return {
+        x: rx,
+        y: ry
+      }
+    } catch (e) {
+      return {
+        x: 0,
+        y: 0
+      }
     }
   }
 
   get2D (zoom = 1) {
-    return {
-      x: this.offsetX + (this.x / ((this.z + this.offsetZ)/zoom)),
-      y: this.offsetY + (this.y / ((this.z + this.offsetZ)/zoom))
+    try {
+      let rx = this.offsetX + (this.x / ((this.z + this.offsetZ)/zoom));
+      let ry =  this.offsetY + (this.y / ((this.z + this.offsetZ)/zoom));
+
+      return {
+        x: rx,
+        y: ry
+      }
+    } catch (e) {
+      return {
+        x: 0,
+        y: 0
+      }
     }
   }
 }

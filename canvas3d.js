@@ -46,28 +46,34 @@ class Canvas3D {
     }
   }
 
-  drawLines(lines, clearScreen) {
+  drawLines(lines, clearScreen, useHW) {
     if (clearScreen)
       this.clearScreen();
 
     for (let i =0; i< lines.length; i++) {
-      this.drawLine(lines[i][0], lines[i][1]);
+      this.drawLine(lines[i][0], lines[i][1], useHW);
     }
   }
 
-  drawLine(pointA, pointB) {
+  drawLine(pointA, pointB, useHW) {
     pointA.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
     pointB.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
     let pA = pointA.getRotated2D(this.worldRotation, this.zoom);
     let pB = pointB.getRotated2D(this.worldRotation, this.zoom);
-    this.drawLineSoftware(pA.x,pA.y, pB.x, pB.y, pointA.color);
+
+    if (useHW) {
+      console.log('HW')
+      this.drawLineHardware(pA.x,pA.y, pB.x, pB.y, pointA.color);
+    } else {
+      this.drawLineSoftware(pA.x,pA.y, pB.x, pB.y, pointA.color);
+    }
   }
 
   drawLineHardware(x,y,x2,y2, color) {
-    this.ctx.strokeStyle = pointA.color;
+    this.ctx.strokeStyle = color;
     this.ctx.beginPath();
-    this.ctx.moveTo(pA.x, pA.y);
-    this.ctx.lineTo(pB.x, pB.y);
+    this.ctx.moveTo(x, y);
+    this.ctx.lineTo(x2, y2);
     this.ctx.stroke();
   }
   lerp(a,b,x) {
@@ -86,7 +92,7 @@ class Canvas3D {
 
   drawPoint(point) {
     point.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
-    
+
     let p2d = point.getRotated2D(this.worldRotation, this.zoom);
     this.ctx.fillStyle = point.color;
     this.ctx.fillRect(Math.round(p2d.x), Math.round(p2d.y), 1, 1);

@@ -4,15 +4,16 @@ window.C3D = new Canvas3D(document.querySelector('canvas'), 200,200,4,200);
 let arr = [];
 let cubePoints  = [];
 let colors = ['red', 'blue','green','yellow','aqua','magenta','cyan','purple'];
-let enableRotateX = false;
-let enableRotateY = false;
-let enableRotateZ = false;
+let enableRotateX = true;
+let enableRotateY = true;
+let enableRotateZ = true;
+let enableHWLineRen = false;
 let previousTimestamp = null;
 window.C3D.cameraPoint.translate(0,0,-5)
 C3D.rotateX(45);
 C3D.rotateZ(45);
 window.addEventListener('keydown', (e) => {
-  console.log(e);
+  // console.log(e);
   if (e.code == 'ArrowLeft') {
     C3D.cameraPoint.translate(-1, 0,0);
   } else if (e.code  == 'ArrowUp') {
@@ -35,6 +36,8 @@ window.addEventListener('keydown', (e) => {
     enableRotateY = !enableRotateY;
   } else if (e.code == 'KeyE') {
     enableRotateZ = !enableRotateZ;
+  } else if (e.code == 'KeyR') {
+    enableHWLineRen = !enableHWLineRen;
   }
 });
 
@@ -48,7 +51,7 @@ const tick = () => {
 
   C3D.clearScreen();
   C3D.drawPoints(arr);
-  C3D.drawLines(cubeLines)
+  C3D.drawLines(cubeLines, false, enableHWLineRen);
 }
 
 
@@ -56,22 +59,23 @@ const raf = (timestamp) => {
   if (!previousTimestamp)
     previousTimestamp = timestamp;
 
-  let delta = timestamp - previousTimestamp;
-
+  let delta = (timestamp - previousTimestamp)/1000;
+  // console.log(delta)
   if (enableRotateX)
-    C3D.rotateZ(1);
+    C3D.rotateZ(10 * delta);
   if (enableRotateY)
-    C3D.rotateY(1);
+    C3D.rotateY(10 * delta);
   if (enableRotateZ)
-    C3D.rotateX(1);
+    C3D.rotateX(10 * delta);
 
 try {
   C3D.clearScreen();
   C3D.drawPoints(arr);
-  C3D.drawLines(cubeLines)
+  C3D.drawLines(cubeLines, false, enableHWLineRen);
 } catch(e) {
   console.log('out of bounds')
 }
+  previousTimestamp = timestamp;
   requestAnimationFrame(raf);
 }
 
@@ -91,15 +95,16 @@ for (let i = 0; i < 5000; i++) {
   updatePoint(point);
   arr.push(point);
 }
+let cubeCenter = new Point3D(0,3,0);
 
-cubePoints.push(new Point3D(-1,1, 1));
-cubePoints.push(new Point3D(-1,1, -1));
-cubePoints.push(new Point3D(-1,-1, 1));
-cubePoints.push(new Point3D(-1,-1, -1));
-cubePoints.push(new Point3D(1,-1, -1));
-cubePoints.push(new Point3D(1,1, -1));
-cubePoints.push(new Point3D(1,-1, 1));
-cubePoints.push(new Point3D(1,1, 1));
+cubePoints.push(new Point3D(-1+cubeCenter.x,1+cubeCenter.y, 1+cubeCenter.z));
+cubePoints.push(new Point3D(-1+cubeCenter.x,1+cubeCenter.y, -1+cubeCenter.z));
+cubePoints.push(new Point3D(-1+cubeCenter.x,-1+cubeCenter.y, 1+cubeCenter.z));
+cubePoints.push(new Point3D(-1+cubeCenter.x,-1+cubeCenter.y, -1+cubeCenter.z));
+cubePoints.push(new Point3D(1+cubeCenter.x,-1+cubeCenter.y, -1+cubeCenter.z));
+cubePoints.push(new Point3D(1+cubeCenter.x,1+cubeCenter.y, -1+cubeCenter.z));
+cubePoints.push(new Point3D(1+cubeCenter.x,-1+cubeCenter.y, 1+cubeCenter.z));
+cubePoints.push(new Point3D(1+cubeCenter.x,1+cubeCenter.y, 1+cubeCenter.z));
 
 let cubeLines = [
   [cubePoints[0], cubePoints[1]],
