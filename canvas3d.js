@@ -8,6 +8,12 @@ class Canvas3D {
   cameraPoint = null;
   zoom = 1;
   worldRotation = new Point3D(0,0,0);
+  stats = {};
+  settings = {
+    occlusion: true,
+    batch: false,
+    hwLines: false
+  };
 
   constructor (canvasElement, width, height, scale, zoom) {
     this.canvasElement = canvasElement;
@@ -35,33 +41,63 @@ class Canvas3D {
 
   clearScreen() {
     this.ctx.clearRect(0,0, this.width, this.height);
+    this.stats.drawnPoints = 0;
+    this.stats.drawnLines = 0;
+    this.stats.fillRects = 0;
+    this.stats.clearScreenAt = Date.now();
   }
 
   drawPoints(points, clearScreen) {
     if(clearScreen)
       this.clearScreen();
 
-    for (let i = 0; i < points.length; i++) {
-      this.drawPoint(points[i]);
+    if (this.settings.batch) {
+      this.drawBatchedPoints(points, clearScreen);
+    } else {
+      for (let i = 0; i < points.length; i++) {
+        this.drawPoint(points[i]);
+      }
     }
   }
 
-  drawLines(lines, clearScreen, useHW) {
+  drawBatchedPoints(points, clearScreen) {
+      if (clearScreen)
+        this.clearScreen();
+
+      let colors = {};
+
+      for (let i = 0; i < points.length; i++) {
+        if (!colors[points[i].color]) {
+          colors[points[i].color] = [];
+        }
+
+        colors[points[i].color].push(points[i]);
+      }
+
+      for (let k in colors) {
+        this.ctx.fillStyle = k;
+        for (let i = 0; i < colors[k].length; i++) {
+          this.drawPointNoColor(colors[k][i]);
+        }
+      }
+  }
+
+  drawLines(lines, clearScreen) {
     if (clearScreen)
       this.clearScreen();
 
     for (let i =0; i< lines.length; i++) {
-      this.drawLine(lines[i][0], lines[i][1], useHW);
+      this.drawLine(lines[i][0], lines[i][1]);
     }
   }
 
-  drawLine(pointA, pointB, useHW) {
+  drawLine(pointA, pointB) {
     pointA.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
     pointB.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
     let pA = pointA.getRotated2D(this.worldRotation, this.zoom);
     let pB = pointB.getRotated2D(this.worldRotation, this.zoom);
-
-    if (useHW) {
+    this.stats.drawnLines ++;
+    if (this.settings.hwLines) {
       this.drawLineHardware(pA.x,pA.y, pB.x, pB.y, pointA.color);
     } else {
       this.drawLineSoftware(pA.x,pA.y, pB.x, pB.y, pointA.color);
@@ -85,16 +121,28 @@ class Canvas3D {
     let diagLength = Math.sqrt(Math.pow(x2-x, 2) + Math.pow(y2-y, 2));
 
     for (let i = 0; i <= diagLength; i++) {
-      this.ctx.fillRect(Math.round((this.lerp(x,x2,i/diagLength))), Math.round((this.lerp(y,y2,i/diagLength))),1,1);
+      this.fillRectWithScreenTest(Math.round((this.lerp(x,x2,i/diagLength))), Math.round((this.lerp(y,y2,i/diagLength))),1,1);
+    }
+  }
+
+  drawPointNoColor(point) {
+    point.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+    this.stats.drawnPoints ++;
+    let p2d = point.getRotated2D(this.worldRotation, this.zoom);
+    this.fillRectWithScreenTest(Math.round(p2d.x), Math.round(p2d.y), 1, 1);
+  }
+
+  fillRectWithScreenTest(x,y,w,h) {
+    if (x <= this.width && x >= 0 && y <= this.height && y >= 0 || !this.settings.occlusion) {
+      this.stats.fillRects ++;
+      this.ctx.fillRect(x,y,w,h);
+
     }
   }
 
   drawPoint(point) {
-    point.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
-
-    let p2d = point.getRotated2D(this.worldRotation, this.zoom);
     this.ctx.fillStyle = point.color;
-    this.ctx.fillRect(Math.round(p2d.x), Math.round(p2d.y), 1, 1);
+    this.drawPointNoColor(point);
   }
 
   rotateY(ang) {
@@ -122,4 +170,60 @@ class Canvas3D {
     this.worldRotation.setPosition(this.worldRotation.x, this.worldRotation.z, newAng);
   }
 
+  completeScreenDraw(obj = {}) {
+    this.start();
+    this.clearScreen();
+    if (obj.lines)
+      this.drawLines(obj.lines, false);
+
+    if (obj.points)
+      this.drawPoints(obj.points, false);
+
+    if (obj.texts)
+      this.drawTexts(obj.texts, false);
+
+    this.finish();
+
+    if (obj.showStats)
+      this.drawStats();
+  }
+
+  start() {
+    this.stats.frameStartedAt = Date.now();
+  }
+
+  finish() {
+    this.stats.frameEndedAt = Date.now();
+    this.stats.spentOnFrame = this.stats.frameEndedAt - this.stats.frameStartedAt;
+  }
+
+  drawStats() {
+    let size = 10;
+    let i = 0;
+    this.ctx.strokeColor = '#0f0';
+    this.ctx.fillStyle = '#0f0';
+    this.ctx.font = `bold ${size}px arial`;
+    let toDraw = {
+      ...this.stats,
+      ...this.settings
+    }
+    for (let k in toDraw) {
+      this.ctx.fillText(`${k}: ${toDraw[k]}`,size,size+ (size*i));
+      i++;
+    }
+  }
+  drawTexts(texts, clearScreen) {
+    if (clearScreen)
+      this.clearScreen();
+
+    for (let i = 0; i < texts.length; i++) {
+      this.drawText(texts[i].text, texts[i].x, texts[i].y, texts[i].color, texts[i].font);
+    }
+  }
+
+  drawText(text, x, y, color = '#0f0', font = 'bold 10px arial') {
+    this.ctx.fillStyle = color;
+    this.ctx.font = font;
+    this.ctx.fillText(text, x,y);
+  }
 }

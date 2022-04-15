@@ -1,6 +1,6 @@
 'use strict';
 
-window.C3D = new Canvas3D(document.querySelector('canvas'), 200,200,4,200);
+window.C3D = new Canvas3D(document.querySelector('canvas'), 400,400,2,200);
 let arr = [];
 let cubePoints  = [];
 let colors = ['red', 'blue','green','yellow','aqua','magenta','cyan','purple'];
@@ -9,6 +9,9 @@ let enableRotateY = true;
 let enableRotateZ = false;
 let enableHWLineRen = false;
 let previousTimestamp = null;
+let enableStats = false;
+let enableBatchPoints = false;
+let enableOcclusion = false;
 window.C3D.cameraPoint.translate(0,0,-10)
 
 window.addEventListener('keydown', (e) => {
@@ -21,9 +24,9 @@ window.addEventListener('keydown', (e) => {
     C3D.cameraPoint.translate(1, 0,0);
   } else if (e.code  == 'ArrowDown') {
     C3D.cameraPoint.translate(0,1,0);
-  } else if (e.code == 'NumpadSubtract') {
+  } else if (e.code == 'NumpadSubtract' || e.code == 'KeyA') {
     C3D.cameraPoint.translate(0,0,-1);
-  } else if (e.code == 'NumpadAdd') {
+  } else if (e.code == 'NumpadAdd' || e.code == 'KeyZ') {
     C3D.cameraPoint.translate(0,0,1);
   } else if (e.code == 'KeyX') {
     C3D.zoom -= 1;
@@ -37,6 +40,21 @@ window.addEventListener('keydown', (e) => {
     enableRotateZ = !enableRotateZ;
   } else if (e.code == 'KeyR') {
     enableHWLineRen = !enableHWLineRen;
+  }  else if (e.code == 'KeyM') {
+    enableStats = !enableStats;
+  } else if (e.code == 'KeyF') {
+    for (let i =0; i< 10; i++) {
+      let point = new Point3D(0,0,0);
+      point.setColor(colors[Math.floor(Math.random() * colors.length)]);
+      updatePoint(point);
+      arr.push(point);
+    }
+  } else if (e.code == 'KeyV') {
+    arr.splice(-10);
+  } else if (e.code == 'KeyB') {
+    enableBatchPoints = !enableBatchPoints;
+  } else if (e.code == 'KeyO') {
+    enableOcclusion =  !enableOcclusion;
   }
 });
 
@@ -56,10 +74,25 @@ const raf = (timestamp) => {
     C3D.rotateZ(10 * delta);
 
 try {
-  C3D.clearScreen();
-  C3D.drawPoints(arr);
-  C3D.drawLines(cubeLines, false, enableHWLineRen);
+  C3D.settings.occlusion = enableOcclusion;
+  C3D.settings.hwLines = enableHWLineRen;
+  C3D.settings.batch = enableBatchPoints;
+
+
+  C3D.completeScreenDraw({
+    lines: cubeLines,
+    points: arr,
+    showStats: enableStats,
+    texts: [
+      {
+        text: 'Press: QWERAZSXVFBMO',
+        x: 0,
+        y: 390
+      }
+    ]
+  })
 } catch(e) {
+  console.warn(e);
   console.log('out of bounds')
 }
   previousTimestamp = timestamp;
@@ -67,18 +100,20 @@ try {
 }
 
 const updatePoint = (point) => {
+  point.setColor(colors[Math.floor(Math.random() * colors.length)]);
   point.setPosition(Math.random() * 2 - 1,Math.random() * 4.0 - 2,Math.random() * 2.0 - 1);
 
 }
 
 const updatePoints = () => {
-  let i = Math.floor(Math.random() * arr.length);
-  updatePoint(arr[i]);
+  for (let k = 0; k < 100; k++) {
+    let i = Math.floor(Math.random() * arr.length);
+    updatePoint(arr[i]);
+  }
 }
 
-for (let i = 0; i < 500; i++) {
+for (let i = 0; i < 10000; i++) {
   let point = new Point3D(0,0,0);
-  point.setColor(colors[Math.floor(Math.random() * colors.length)]);
   updatePoint(point);
   arr.push(point);
 }
@@ -112,6 +147,6 @@ for (let i =0; i < cubePoints.length; i++) {
   cubePoints[i].setColor('#f0f');
 }
 
-setInterval(updatePoints, 100);
+setInterval(updatePoints, 15);
 
 requestAnimationFrame(raf);
