@@ -1,6 +1,10 @@
 'use strict';
 
-window.C3D = new Canvas3D(document.querySelector('canvas'), 400,400,2,200);
+const DEFAULT_WIDTH = 400;
+const DEFAULT_HEIGHT = 400;
+const DEFAULT_SCALE = 2;
+
+window.C3D = new Canvas3D(document.querySelector('canvas'), DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SCALE, 200);
 let arr = [];
 let cubePoints  = [];
 let colors = ['red', 'blue','green','yellow','aqua','magenta','cyan','purple'];
@@ -22,6 +26,27 @@ const toggleHelp = () => {
     helpOverlay.classList.add('hidden');
   }
 };
+
+let fullscreen = false;
+const toggleFullscreen = () => {
+  fullscreen = !fullscreen;
+  if (fullscreen) {
+    if (document.body.requestFullscreen)
+      document.body.requestFullscreen();
+    C3D.initScreen(window.innerWidth, window.innerHeight, 1);
+  } else {
+    if (document.exitFullscreen)
+      document.exitFullscreen();
+    C3D.initScreen(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SCALE);
+  }
+};
+
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) {
+    fullscreen = false;
+    C3D.initScreen(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SCALE);
+  }
+});
 window.C3D.cameraPoint.translate(0,0,-10)
 
 window.addEventListener('keydown', (e) => {
@@ -65,6 +90,8 @@ window.addEventListener('keydown', (e) => {
     enableBatchPoints = !enableBatchPoints;
   } else if (e.code == 'KeyO') {
     enableOcclusion =  !enableOcclusion;
+  } else if (e.code == 'KeyL') {
+    toggleFullscreen();
   } else if (e.code == 'KeyH') {
     toggleHelp();
   }
