@@ -34,6 +34,9 @@ class Canvas3D {
   }
 
   initScreen (width, height, scale) {
+    this.width = width;
+    this.height = height;
+    this.cameraPoint.setPosition(width/2, height/2, this.cameraPoint.z);
     this.canvasElement.setAttribute('width', `${width}px`);
     this.canvasElement.setAttribute('height', `${height}px`);
     this.canvasElement.setAttribute('style', `width:${Math.round(width * scale)}px;height:${Math.round(height * scale)}px;image-rendering: pixelated;`)
