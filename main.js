@@ -31,6 +31,8 @@ let enableBatchPoints = false;
 let enableOcclusion = false;
 const helpOverlay = document.getElementById('help-overlay');
 const statsOverlay = document.getElementById('stats-overlay');
+const pressHint = document.getElementById('press-hint');
+pressHint.classList.add('hidden');
 let helpVisible = true;
 let mouseDown = false;
 let lastMouseX = 0;
@@ -40,8 +42,10 @@ const toggleHelp = () => {
   helpVisible = !helpVisible;
   if (helpVisible) {
     helpOverlay.classList.remove('hidden');
+    pressHint.classList.add('hidden');
   } else {
     helpOverlay.classList.add('hidden');
+    pressHint.classList.remove('hidden');
   }
 };
 const toggleStats = () => {
@@ -184,14 +188,7 @@ try {
     C3D.completeScreenDraw({
       lines: cubeLines,
       points: arr,
-      showStats: false,
-      texts: [
-      {
-        text: 'Press H for help',
-        x: 0,
-        y: C3D.height - 10
-      }
-      ]
+      showStats: false
     })
     if (statsVisible) {
       const stats = C3D.getStats();
