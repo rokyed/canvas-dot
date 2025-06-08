@@ -99,6 +99,15 @@ document.addEventListener('mousemove', (e) => {
   C3D.rotateX(dy * MOUSE_SENSITIVITY);
 });
 
+document.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  if (e.deltaY < 0) {
+    C3D.zoom += 1;
+  } else {
+    C3D.zoom -= 1;
+  }
+});
+
 window.addEventListener('keydown', (e) => {
   // console.log(e);
   if (e.code == 'ArrowLeft') {
