@@ -16,14 +16,26 @@
       font-size: 12px;
     }
     #help-overlay.hidden { display: none; }
+    #stats-overlay {
+      position: absolute;
+      right: 0;
+      top: 0;
+      padding: 5px 10px;
+      background: rgba(0,0,0,0.7);
+      color: #0f0;
+      font-family: monospace;
+      font-size: 12px;
+      text-align: right;
+    }
+    #stats-overlay.hidden { display: none; }
     </style>
     <meta charset="utf-8">
     <title></title>
   </head>
 
   <body>
-    <canvas></canvas>
-    <div id="help-overlay">
+  <canvas></canvas>
+  <div id="help-overlay">
       <div>
         <strong>Controls</strong><br>
         Arrow Keys: move camera<br>
@@ -38,9 +50,10 @@
         L: fullscreen<br>
         H: hide help
       </div>
-    </div>
-    <script src="./point3d.js"></script>
-    <script src="./canvas3d.js"></script>
-    <script src="./main.js"></script>
+  </div>
+  <div id="stats-overlay" class="hidden"></div>
+  <script src="./point3d.js"></script>
+  <script src="./canvas3d.js"></script>
+  <script src="./main.js"></script>
   </body>
 </html>

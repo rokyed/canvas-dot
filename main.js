@@ -13,10 +13,11 @@ let enableRotateY = true;
 let enableRotateZ = false;
 let enableHWLineRen = false;
 let previousTimestamp = null;
-let enableStats = false;
+let statsVisible = false;
 let enableBatchPoints = false;
 let enableOcclusion = false;
 const helpOverlay = document.getElementById('help-overlay');
+const statsOverlay = document.getElementById('stats-overlay');
 let helpVisible = true;
 const toggleHelp = () => {
   helpVisible = !helpVisible;
@@ -24,6 +25,14 @@ const toggleHelp = () => {
     helpOverlay.classList.remove('hidden');
   } else {
     helpOverlay.classList.add('hidden');
+  }
+};
+const toggleStats = () => {
+  statsVisible = !statsVisible;
+  if (statsVisible) {
+    statsOverlay.classList.remove('hidden');
+  } else {
+    statsOverlay.classList.add('hidden');
   }
 };
 
@@ -47,6 +56,7 @@ document.addEventListener('fullscreenchange', () => {
     C3D.initScreen(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SCALE);
   }
 });
+
 window.C3D.cameraPoint.translate(0,0,-10)
 
 window.addEventListener('keydown', (e) => {
@@ -76,7 +86,7 @@ window.addEventListener('keydown', (e) => {
   } else if (e.code == 'KeyR') {
     enableHWLineRen = !enableHWLineRen;
   }  else if (e.code == 'KeyM') {
-    enableStats = !enableStats;
+    toggleStats();
   } else if (e.code == 'KeyF') {
     for (let i =0; i< 10; i++) {
       let point = new Point3D(0,0,0);
@@ -118,19 +128,25 @@ try {
   C3D.settings.batch = enableBatchPoints;
 
 
-  C3D.completeScreenDraw({
-    lines: cubeLines,
-    points: arr,
-    showStats: enableStats,
-    texts: [
+    C3D.completeScreenDraw({
+      lines: cubeLines,
+      points: arr,
+      showStats: false,
+      texts: [
       {
         text: 'Press H for help',
         x: 0,
         y: 390
       }
-    ]
-  })
-} catch(e) {
+      ]
+    })
+    if (statsVisible) {
+      const stats = C3D.getStats();
+      statsOverlay.innerHTML = Object.keys(stats)
+        .map(k => `${k}: ${stats[k]}`)
+        .join('<br>');
+    }
+  } catch(e) {
   console.warn(e);
   console.log('out of bounds')
 }

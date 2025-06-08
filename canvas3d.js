@@ -215,6 +215,13 @@ class Canvas3D {
       i++;
     }
   }
+
+  getStats() {
+    return {
+      ...this.stats,
+      ...this.settings
+    };
+  }
   drawTexts(texts, clearScreen) {
     if (clearScreen)
       this.clearScreen();
