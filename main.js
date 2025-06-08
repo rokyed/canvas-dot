@@ -1,10 +1,21 @@
 'use strict';
 
-const DEFAULT_WIDTH = 400;
-const DEFAULT_HEIGHT = 400;
-const DEFAULT_SCALE = 2;
+const DEFAULT_SCALE = 1;
 
-window.C3D = new Canvas3D(document.querySelector('canvas'), DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SCALE, 200);
+const getScreenSize = () => ({
+  width: window.innerWidth,
+  height: window.innerHeight
+});
+
+let { width: screenWidth, height: screenHeight } = getScreenSize();
+
+window.C3D = new Canvas3D(
+  document.querySelector('canvas'),
+  screenWidth,
+  screenHeight,
+  DEFAULT_SCALE,
+  200
+);
 let arr = [];
 let cubePoints  = [];
 let colors = ['red', 'blue','green','yellow','aqua','magenta','cyan','purple'];
@@ -37,25 +48,26 @@ const toggleStats = () => {
 };
 
 let fullscreen = false;
+
+const updateScreenSize = () => {
+  const { width, height } = getScreenSize();
+  C3D.initScreen(width, height, DEFAULT_SCALE);
+};
+
 const toggleFullscreen = () => {
   fullscreen = !fullscreen;
   if (fullscreen) {
     if (document.body.requestFullscreen)
       document.body.requestFullscreen();
-    C3D.initScreen(window.innerWidth, window.innerHeight, 1);
   } else {
     if (document.exitFullscreen)
       document.exitFullscreen();
-    C3D.initScreen(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SCALE);
   }
+  updateScreenSize();
 };
 
-document.addEventListener('fullscreenchange', () => {
-  if (!document.fullscreenElement) {
-    fullscreen = false;
-    C3D.initScreen(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_SCALE);
-  }
-});
+document.addEventListener('fullscreenchange', updateScreenSize);
+window.addEventListener('resize', updateScreenSize);
 
 window.C3D.cameraPoint.translate(0,0,-10)
 
@@ -136,7 +148,7 @@ try {
       {
         text: 'Press H for help',
         x: 0,
-        y: 390
+        y: C3D.height - 10
       }
       ]
     })
