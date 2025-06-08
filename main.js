@@ -12,6 +12,16 @@ let previousTimestamp = null;
 let enableStats = false;
 let enableBatchPoints = false;
 let enableOcclusion = false;
+const helpOverlay = document.getElementById('help-overlay');
+let helpVisible = true;
+const toggleHelp = () => {
+  helpVisible = !helpVisible;
+  if (helpVisible) {
+    helpOverlay.classList.remove('hidden');
+  } else {
+    helpOverlay.classList.add('hidden');
+  }
+};
 window.C3D.cameraPoint.translate(0,0,-10)
 
 window.addEventListener('keydown', (e) => {
@@ -55,6 +65,8 @@ window.addEventListener('keydown', (e) => {
     enableBatchPoints = !enableBatchPoints;
   } else if (e.code == 'KeyO') {
     enableOcclusion =  !enableOcclusion;
+  } else if (e.code == 'KeyH') {
+    toggleHelp();
   }
 });
 
@@ -85,7 +97,7 @@ try {
     showStats: enableStats,
     texts: [
       {
-        text: 'Press: QWERAZSXVFBMO',
+        text: 'Press H for help',
         x: 0,
         y: 390
       }
