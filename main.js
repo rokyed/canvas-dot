@@ -30,6 +30,10 @@ let enableOcclusion = false;
 const helpOverlay = document.getElementById('help-overlay');
 const statsOverlay = document.getElementById('stats-overlay');
 let helpVisible = true;
+let mouseDown = false;
+let lastMouseX = 0;
+let lastMouseY = 0;
+const MOUSE_SENSITIVITY = 0.2;
 const toggleHelp = () => {
   helpVisible = !helpVisible;
   if (helpVisible) {
@@ -70,6 +74,30 @@ document.addEventListener('fullscreenchange', updateScreenSize);
 window.addEventListener('resize', updateScreenSize);
 
 window.C3D.cameraPoint.translate(0,0,-10)
+
+document.addEventListener('mousedown', (e) => {
+  mouseDown = true;
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+});
+
+document.addEventListener('mouseup', () => {
+  mouseDown = false;
+});
+
+document.addEventListener('mouseleave', () => {
+  mouseDown = false;
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!mouseDown) return;
+  const dx = e.clientX - lastMouseX;
+  const dy = e.clientY - lastMouseY;
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+  C3D.rotateY(dx * MOUSE_SENSITIVITY);
+  C3D.rotateX(dy * MOUSE_SENSITIVITY);
+});
 
 window.addEventListener('keydown', (e) => {
   // console.log(e);
