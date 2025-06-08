@@ -1,19 +1,21 @@
 'use strict';
 
-const DEFAULT_SCALE = 1;
+const RENDER_SCALE = 2; // canvas is scaled up 2x so rendering is at half resolution
 
 const getScreenSize = () => ({
   width: window.innerWidth,
   height: window.innerHeight
 });
 
-let { width: screenWidth, height: screenHeight } = getScreenSize();
+const { width: screenWidth, height: screenHeight } = getScreenSize();
+const renderWidth = screenWidth / RENDER_SCALE;
+const renderHeight = screenHeight / RENDER_SCALE;
 
 window.C3D = new Canvas3D(
   document.querySelector('canvas'),
-  screenWidth,
-  screenHeight,
-  DEFAULT_SCALE,
+  renderWidth,
+  renderHeight,
+  RENDER_SCALE,
   200
 );
 let arr = [];
@@ -55,7 +57,9 @@ let fullscreen = false;
 
 const updateScreenSize = () => {
   const { width, height } = getScreenSize();
-  C3D.initScreen(width, height, DEFAULT_SCALE);
+  const renderWidth = width / RENDER_SCALE;
+  const renderHeight = height / RENDER_SCALE;
+  C3D.initScreen(renderWidth, renderHeight, RENDER_SCALE);
 };
 
 const toggleFullscreen = () => {
