@@ -249,35 +249,46 @@ let cubeLines = [
   [cubePoints[5], cubePoints[4]],
 ]
 
-let swordPoints = [];
-// define a simple sword model
-swordPoints.push(new Point3D(0, 3, 0));     // tip
-swordPoints.push(new Point3D(-0.2, 1, 0));  // left blade base
-swordPoints.push(new Point3D(0.2, 1, 0));   // right blade base
-swordPoints.push(new Point3D(-1, 0.8, 0));  // crossguard left end
-swordPoints.push(new Point3D(1, 0.8, 0));   // crossguard right end
-swordPoints.push(new Point3D(-0.2, 0, 0));  // handle left top
-swordPoints.push(new Point3D(0.2, 0, 0));   // handle right top
-swordPoints.push(new Point3D(-0.2, -1.5, 0)); // handle left bottom
-swordPoints.push(new Point3D(0.2, -1.5, 0));  // handle right bottom
-swordPoints.push(new Point3D(0, -1.7, 0));  // pommel
+// base points for a flat sword model
+const baseSwordPoints = [];
+baseSwordPoints.push(new Point3D(0, 3, 0));     // tip
+baseSwordPoints.push(new Point3D(-0.2, 1, 0));  // left blade base
+baseSwordPoints.push(new Point3D(0.2, 1, 0));   // right blade base
+baseSwordPoints.push(new Point3D(-1, 0.8, 0));  // crossguard left end
+baseSwordPoints.push(new Point3D(1, 0.8, 0));   // crossguard right end
+baseSwordPoints.push(new Point3D(-0.2, 0, 0));  // handle left top
+baseSwordPoints.push(new Point3D(0.2, 0, 0));   // handle right top
+baseSwordPoints.push(new Point3D(-0.2, -1.5, 0)); // handle left bottom
+baseSwordPoints.push(new Point3D(0.2, -1.5, 0));  // handle right bottom
+baseSwordPoints.push(new Point3D(0, -1.7, 0));  // pommel
 
-let swordLines = [
-  [swordPoints[0], swordPoints[1]],
-  [swordPoints[0], swordPoints[2]],
-  [swordPoints[1], swordPoints[2]],
-  [swordPoints[1], swordPoints[3]],
-  [swordPoints[2], swordPoints[4]],
-  [swordPoints[3], swordPoints[4]],
-  [swordPoints[1], swordPoints[5]],
-  [swordPoints[2], swordPoints[6]],
-  [swordPoints[5], swordPoints[6]],
-  [swordPoints[5], swordPoints[7]],
-  [swordPoints[6], swordPoints[8]],
-  [swordPoints[7], swordPoints[8]],
-  [swordPoints[7], swordPoints[9]],
-  [swordPoints[8], swordPoints[9]],
+// give the sword some thickness by duplicating points on the Z axis
+const SWORD_THICKNESS = 0.2;
+const HALF_THICKNESS = SWORD_THICKNESS / 2;
+const swordFrontPoints = baseSwordPoints.map(p => new Point3D(p.x, p.y, -HALF_THICKNESS));
+const swordBackPoints = baseSwordPoints.map(p => new Point3D(p.x, p.y, HALF_THICKNESS));
+
+let swordPoints = [...swordFrontPoints, ...swordBackPoints];
+
+const baseSwordLines = [
+  [0, 1], [0, 2], [1, 2], [1, 3], [2, 4], [3, 4],
+  [1, 5], [2, 6], [5, 6], [5, 7], [6, 8], [7, 8],
+  [7, 9], [8, 9]
 ];
+
+let swordLines = [];
+// front face lines
+for (const [a, b] of baseSwordLines) {
+  swordLines.push([swordPoints[a], swordPoints[b]]);
+}
+// back face lines
+for (const [a, b] of baseSwordLines) {
+  swordLines.push([swordPoints[a + baseSwordPoints.length], swordPoints[b + baseSwordPoints.length]]);
+}
+// side lines connecting front and back points
+for (let i = 0; i < baseSwordPoints.length; i++) {
+  swordLines.push([swordPoints[i], swordPoints[i + baseSwordPoints.length]]);
+}
 
 for (let i =0; i < cubePoints.length; i++) {
   cubePoints[i].setColor('#f0f');
