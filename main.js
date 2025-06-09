@@ -121,6 +121,7 @@ document.addEventListener('wheel', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchstart', (e) => {
+  if (e.target.closest('#model-select')) return;
   if (e.touches.length === 1) {
     mouseDown = true;
     lastMouseX = e.touches[0].clientX;
@@ -137,6 +138,7 @@ document.addEventListener('touchstart', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchmove', (e) => {
+  if (e.target.closest('#model-select')) return;
   if (e.touches.length === 1 && mouseDown) {
     const touch = e.touches[0];
     const dx = touch.clientX - lastMouseX;
@@ -157,6 +159,7 @@ document.addEventListener('touchmove', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchend', (e) => {
+  if (e.target.closest('#model-select')) return;
   if (e.touches.length === 0) {
     mouseDown = false;
   }
@@ -167,6 +170,7 @@ document.addEventListener('touchend', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchcancel', (e) => {
+  if (e.target.closest('#model-select')) return;
   mouseDown = false;
   pinchStartZoom = C3D.zoom;
   e.preventDefault();
