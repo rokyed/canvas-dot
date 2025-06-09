@@ -120,7 +120,7 @@ document.addEventListener('wheel', (e) => {
   } else {
     C3D.zoom -= ZOOM_SENSITIVITY;
   }
-});
+}, { passive: false });
 
 document.addEventListener('touchstart', (e) => {
   if (e.touches.length === 1) {
@@ -134,7 +134,7 @@ document.addEventListener('touchstart', (e) => {
     );
     pinchStartZoom = C3D.zoom;
   }
-});
+}, { passive: false });
 
 document.addEventListener('touchmove', (e) => {
   if (e.touches.length === 1 && mouseDown) {
@@ -154,17 +154,17 @@ document.addEventListener('touchmove', (e) => {
     C3D.zoom = pinchStartZoom + delta * 0.01;
   }
   e.preventDefault();
-});
+}, { passive: false });
 
 document.addEventListener('touchend', (e) => {
   if (e.touches.length === 0) {
     mouseDown = false;
   }
-});
+}, { passive: false });
 
 document.addEventListener('touchcancel', () => {
   mouseDown = false;
-});
+}, { passive: false });
 
 window.addEventListener('keydown', (e) => {
   // console.log(e);
