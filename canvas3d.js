@@ -7,6 +7,8 @@ class Canvas3D {
   height = 0;
   cameraPoint = null;
   zoom = 1;
+  // scale factor applied to point sizes when rendering
+  pointSizeScale = 0.1;
   worldRotation = new Point3D(0,0,0);
   stats = {};
   settings = {
@@ -148,7 +150,7 @@ class Canvas3D {
     point.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
     this.stats.drawnPoints ++;
     let p2d = point.getRotated2D(this.worldRotation, this.zoom);
-    let size = point.getScale(this.worldRotation, this.zoom);
+    let size = point.getScale(this.worldRotation, this.zoom) * this.pointSizeScale;
     size = Math.max(1, size);
     this.fillRectWithScreenTest(Math.round(p2d.x - size/2), Math.round(p2d.y - size/2), Math.round(size), Math.round(size));
   }
