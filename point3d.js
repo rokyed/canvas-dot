@@ -91,6 +91,15 @@ class Point3D {
     }
   }
 
+  getScale(worldRotation, zoom = 1) {
+    let rot = this.rotateAroundX(this.x, this.y, this.z, worldRotation.x);
+    rot = this.rotateAroundY(rot.x, rot.y, rot.z, worldRotation.y);
+    rot = this.rotateAroundZ(rot.x, rot.y, rot.z, worldRotation.z);
+    const denom = (rot.z + this.offsetZ) / zoom;
+    if (denom === 0) return 0;
+    return Math.abs(1 / denom);
+  }
+
   get2D (zoom = 1) {
     try {
       let rx = this.offsetX + (this.x / ((this.z + this.offsetZ)/zoom));
