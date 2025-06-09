@@ -33,6 +33,8 @@ const helpOverlay = document.getElementById('help-overlay');
 const statsOverlay = document.getElementById('stats-overlay');
 const pressHint = document.getElementById('press-hint');
 const modelToggleBtn = document.getElementById('model-toggle');
+// default model is sword so button should allow switching to cube
+modelToggleBtn.textContent = 'Show Cube';
 pressHint.classList.add('hidden');
 let helpVisible = true;
 let mouseDown = false;
@@ -218,7 +220,8 @@ const updatePoints = () => {
   }
 }
 
-for (let i = 0; i < 10000; i++) {
+// start with no random points in space
+for (let i = 0; i < 0; i++) {
   let point = new Point3D(0,0,0);
   updatePoint(point);
   arr.push(point);
@@ -298,8 +301,8 @@ for (let i =0; i < swordPoints.length; i++) {
   swordPoints[i].setColor('#0ff');
 }
 
-let currentLines = cubeLines;
-let currentModel = 'cube';
+let currentLines = swordLines;
+let currentModel = 'sword';
 
 const toggleModel = () => {
   if (currentModel === 'cube') {
