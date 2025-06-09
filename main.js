@@ -40,6 +40,8 @@ let helpVisible = true;
 let mouseDown = false;
 let lastMouseX = 0;
 let lastMouseY = 0;
+let pinchStartDist = 0;
+let pinchStartZoom = 0;
 const MOUSE_SENSITIVITY = 0.2;
 const toggleHelp = () => {
   helpVisible = !helpVisible;
@@ -117,6 +119,50 @@ document.addEventListener('wheel', (e) => {
   } else {
     C3D.zoom -= 1;
   }
+});
+
+document.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 1) {
+    mouseDown = true;
+    lastMouseX = e.touches[0].clientX;
+    lastMouseY = e.touches[0].clientY;
+  } else if (e.touches.length === 2) {
+    pinchStartDist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    pinchStartZoom = C3D.zoom;
+  }
+});
+
+document.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 1 && mouseDown) {
+    const touch = e.touches[0];
+    const dx = touch.clientX - lastMouseX;
+    const dy = touch.clientY - lastMouseY;
+    lastMouseX = touch.clientX;
+    lastMouseY = touch.clientY;
+    C3D.rotateY(dx * MOUSE_SENSITIVITY);
+    C3D.rotateX(dy * MOUSE_SENSITIVITY);
+  } else if (e.touches.length === 2) {
+    const dist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    const delta = dist - pinchStartDist;
+    C3D.zoom = pinchStartZoom + delta * 0.01;
+  }
+  e.preventDefault();
+});
+
+document.addEventListener('touchend', (e) => {
+  if (e.touches.length === 0) {
+    mouseDown = false;
+  }
+});
+
+document.addEventListener('touchcancel', () => {
+  mouseDown = false;
 });
 
 window.addEventListener('keydown', (e) => {
