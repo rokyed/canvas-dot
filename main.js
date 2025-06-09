@@ -116,9 +116,9 @@ document.addEventListener('mousemove', (e) => {
 document.addEventListener('wheel', (e) => {
   e.preventDefault();
   if (e.deltaY < 0) {
-    C3D.zoom += ZOOM_SENSITIVITY;
+    C3D.setZoom(C3D.zoom + ZOOM_SENSITIVITY);
   } else {
-    C3D.zoom -= ZOOM_SENSITIVITY;
+    C3D.setZoom(C3D.zoom - ZOOM_SENSITIVITY);
   }
 }, { passive: false });
 
@@ -151,7 +151,7 @@ document.addEventListener('touchmove', (e) => {
       e.touches[0].clientY - e.touches[1].clientY
     );
     const delta = dist - pinchStartDist;
-    C3D.zoom = pinchStartZoom + delta * 0.01;
+    C3D.setZoom(pinchStartZoom + delta * 0.01);
   }
   e.preventDefault();
 }, { passive: false });
@@ -181,9 +181,9 @@ window.addEventListener('keydown', (e) => {
   } else if (e.code == 'NumpadAdd' || e.code == 'KeyZ') {
     C3D.cameraPoint.translate(0,0,1);
   } else if (e.code == 'KeyX') {
-    C3D.zoom -= ZOOM_SENSITIVITY;
+    C3D.setZoom(C3D.zoom - ZOOM_SENSITIVITY);
   } else if (e.code == 'KeyS') {
-    C3D.zoom += ZOOM_SENSITIVITY;
+    C3D.setZoom(C3D.zoom + ZOOM_SENSITIVITY);
   } else if (e.code == 'KeyQ') {
     enableRotateX = !enableRotateX;
   } else if (e.code == 'KeyW') {
