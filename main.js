@@ -32,9 +32,7 @@ let enableOcclusion = false;
 const helpOverlay = document.getElementById('help-overlay');
 const statsOverlay = document.getElementById('stats-overlay');
 const pressHint = document.getElementById('press-hint');
-const modelToggleBtn = document.getElementById('model-toggle');
-// default model is sword so button should allow switching to cube
-modelToggleBtn.textContent = 'Show Cube';
+const modelSelect = document.getElementById('model-select');
 pressHint.classList.add('hidden');
 let helpVisible = true;
 let mouseDown = false;
@@ -387,26 +385,52 @@ const createSphere = (segments = 16, loops = 16, radius = 2) => {
 const { points: spherePoints, lines: sphereLines } = createSphere(16, 16, 2);
 spherePoints.forEach(p => p.setColor('#ff0'));
 
-let currentLines = swordLines;
-let currentModel = 'sword';
+const createStar = (points = 5, outerRadius = 2, innerRadius = 1, thickness = 0.5) => {
+  const base = [];
+  for (let i = 0; i < points * 2; i++) {
+    const angle = (i * Math.PI) / points;
+    const r = i % 2 === 0 ? outerRadius : innerRadius;
+    base.push(new Point3D(r * Math.cos(angle), r * Math.sin(angle), 0));
+  }
+  const front = base.map(p => new Point3D(p.x, p.y, -thickness / 2));
+  const back = base.map(p => new Point3D(p.x, p.y, thickness / 2));
+  const all = [...front, ...back];
+  const lines = [];
+  const len = base.length;
+  for (let i = 0; i < len; i++) {
+    const next = (i + 1) % len;
+    lines.push([all[i], all[next]]);
+  }
+  for (let i = 0; i < len; i++) {
+    const next = (i + 1) % len;
+    lines.push([all[i + len], all[next + len]]);
+  }
+  for (let i = 0; i < len; i++) {
+    lines.push([all[i], all[i + len]]);
+  }
+  return { points: all, lines };
+};
 
-const toggleModel = () => {
-  if (currentModel === 'sword') {
-    currentModel = 'cube';
+const { points: starPoints, lines: starLines } = createStar(5, 2, 1, 0.4);
+starPoints.forEach(p => p.setColor('#fa0'));
+
+let currentLines = swordLines;
+
+const updateModel = () => {
+  const value = modelSelect.value;
+  if (value === 'cube') {
     currentLines = cubeLines;
-    modelToggleBtn.textContent = 'Show Sphere';
-  } else if (currentModel === 'cube') {
-    currentModel = 'sphere';
+  } else if (value === 'sphere') {
     currentLines = sphereLines;
-    modelToggleBtn.textContent = 'Show Sword';
+  } else if (value === 'star') {
+    currentLines = starLines;
   } else {
-    currentModel = 'sword';
     currentLines = swordLines;
-    modelToggleBtn.textContent = 'Show Cube';
   }
 };
 
-modelToggleBtn.addEventListener('click', toggleModel);
+modelSelect.addEventListener('change', updateModel);
+updateModel();
 
 setInterval(updatePoints, 15);
 
