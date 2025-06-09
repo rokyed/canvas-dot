@@ -95,9 +95,12 @@ class Point3D {
     let rot = this.rotateAroundX(this.x, this.y, this.z, worldRotation.x);
     rot = this.rotateAroundY(rot.x, rot.y, rot.z, worldRotation.y);
     rot = this.rotateAroundZ(rot.x, rot.y, rot.z, worldRotation.z);
-    const denom = (rot.z + this.offsetZ) / zoom;
-    if (denom === 0) return 0;
-    return Math.abs(1 / denom);
+    const dx = rot.x;
+    const dy = rot.y;
+    const dz = rot.z + this.offsetZ;
+    const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (distance === 0) return 0;
+    return zoom / distance;
   }
 
   get2D (zoom = 1) {
