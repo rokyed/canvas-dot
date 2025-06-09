@@ -301,18 +301,53 @@ for (let i =0; i < swordPoints.length; i++) {
   swordPoints[i].setColor('#0ff');
 }
 
+// create a sphere model with 16 segments and 16 loops
+const createSphere = (segments = 16, loops = 16, radius = 2) => {
+  const points = [];
+  const lines = [];
+  for (let i = 0; i <= loops; i++) {
+    const phi = (i / loops) * Math.PI - Math.PI / 2;
+    const cosPhi = Math.cos(phi);
+    const sinPhi = Math.sin(phi);
+    for (let j = 0; j <= segments; j++) {
+      const theta = (j / segments) * Math.PI * 2;
+      const x = radius * cosPhi * Math.cos(theta);
+      const y = radius * sinPhi;
+      const z = radius * cosPhi * Math.sin(theta);
+      points.push(new Point3D(x, y, z));
+    }
+  }
+  for (let i = 0; i < loops; i++) {
+    for (let j = 0; j < segments; j++) {
+      const a = i * (segments + 1) + j;
+      const b = a + 1;
+      const c = a + (segments + 1);
+      lines.push([points[a], points[b]]);
+      lines.push([points[a], points[c]]);
+    }
+  }
+  return { points, lines };
+};
+
+const { points: spherePoints, lines: sphereLines } = createSphere(16, 16, 2);
+spherePoints.forEach(p => p.setColor('#ff0'));
+
 let currentLines = swordLines;
 let currentModel = 'sword';
 
 const toggleModel = () => {
-  if (currentModel === 'cube') {
+  if (currentModel === 'sword') {
+    currentModel = 'cube';
+    currentLines = cubeLines;
+    modelToggleBtn.textContent = 'Show Sphere';
+  } else if (currentModel === 'cube') {
+    currentModel = 'sphere';
+    currentLines = sphereLines;
+    modelToggleBtn.textContent = 'Show Sword';
+  } else {
     currentModel = 'sword';
     currentLines = swordLines;
     modelToggleBtn.textContent = 'Show Cube';
-  } else {
-    currentModel = 'cube';
-    currentLines = cubeLines;
-    modelToggleBtn.textContent = 'Show Sword';
   }
 };
 
