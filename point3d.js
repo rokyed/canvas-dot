@@ -103,6 +103,16 @@ class Point3D {
     return zoom / distance;
   }
 
+  getDistanceFromCamera(worldRotation) {
+    let rot = this.rotateAroundX(this.x, this.y, this.z, worldRotation.x);
+    rot = this.rotateAroundY(rot.x, rot.y, rot.z, worldRotation.y);
+    rot = this.rotateAroundZ(rot.x, rot.y, rot.z, worldRotation.z);
+    const dx = rot.x;
+    const dy = rot.y;
+    const dz = rot.z + this.offsetZ;
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
   get2D (zoom = 1) {
     try {
       let rx = this.offsetX + (this.x / ((this.z + this.offsetZ)/zoom));
