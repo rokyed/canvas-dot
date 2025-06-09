@@ -27,6 +27,11 @@ class Canvas3D {
     this.initScreen(width, height, scale);
   }
 
+  setZoom(z) {
+    // prevent negative or zero zoom values which break perspective
+    this.zoom = Math.max(1, z);
+  }
+
   initCanvas() {
     this.ctx = this.canvasElement.getContext('2d');
     this.ctx.msImageSmoothingEnabled = false;
@@ -196,7 +201,8 @@ class Canvas3D {
     if (newAng > 360)
       newAng -= 360;
 
-    this.worldRotation.setPosition(this.worldRotation.x, this.worldRotation.z, newAng);
+    // use current Y rotation value, not Z, when updating rotation vector
+    this.worldRotation.setPosition(this.worldRotation.x, this.worldRotation.y, newAng);
   }
 
   completeScreenDraw(obj = {}) {
