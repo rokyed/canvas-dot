@@ -134,6 +134,8 @@ document.addEventListener('touchstart', (e) => {
     );
     pinchStartZoom = C3D.zoom;
   }
+  // Prevent the browser from handling gestures like double tap to zoom
+  e.preventDefault();
 }, { passive: false });
 
 document.addEventListener('touchmove', (e) => {
@@ -160,10 +162,16 @@ document.addEventListener('touchend', (e) => {
   if (e.touches.length === 0) {
     mouseDown = false;
   }
+  // Make sure the current zoom persists after the gesture ends
+  pinchStartZoom = C3D.zoom;
+  // Prevent the browser from triggering click or zoom actions
+  e.preventDefault();
 }, { passive: false });
 
-document.addEventListener('touchcancel', () => {
+document.addEventListener('touchcancel', (e) => {
   mouseDown = false;
+  pinchStartZoom = C3D.zoom;
+  e.preventDefault();
 }, { passive: false });
 
 window.addEventListener('keydown', (e) => {
