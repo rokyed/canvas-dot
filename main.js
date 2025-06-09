@@ -32,6 +32,7 @@ let enableOcclusion = false;
 const helpOverlay = document.getElementById('help-overlay');
 const statsOverlay = document.getElementById('stats-overlay');
 const pressHint = document.getElementById('press-hint');
+const modelToggleBtn = document.getElementById('model-toggle');
 pressHint.classList.add('hidden');
 let helpVisible = true;
 let mouseDown = false;
@@ -186,7 +187,7 @@ try {
 
 
     C3D.completeScreenDraw({
-      lines: cubeLines,
+      lines: currentLines,
       points: arr,
       showStats: false
     })
@@ -248,9 +249,60 @@ let cubeLines = [
   [cubePoints[5], cubePoints[4]],
 ]
 
+let swordPoints = [];
+// define a simple sword model
+swordPoints.push(new Point3D(0, 3, 0));     // tip
+swordPoints.push(new Point3D(-0.2, 1, 0));  // left blade base
+swordPoints.push(new Point3D(0.2, 1, 0));   // right blade base
+swordPoints.push(new Point3D(-1, 0.8, 0));  // crossguard left end
+swordPoints.push(new Point3D(1, 0.8, 0));   // crossguard right end
+swordPoints.push(new Point3D(-0.2, 0, 0));  // handle left top
+swordPoints.push(new Point3D(0.2, 0, 0));   // handle right top
+swordPoints.push(new Point3D(-0.2, -1.5, 0)); // handle left bottom
+swordPoints.push(new Point3D(0.2, -1.5, 0));  // handle right bottom
+swordPoints.push(new Point3D(0, -1.7, 0));  // pommel
+
+let swordLines = [
+  [swordPoints[0], swordPoints[1]],
+  [swordPoints[0], swordPoints[2]],
+  [swordPoints[1], swordPoints[2]],
+  [swordPoints[1], swordPoints[3]],
+  [swordPoints[2], swordPoints[4]],
+  [swordPoints[3], swordPoints[4]],
+  [swordPoints[1], swordPoints[5]],
+  [swordPoints[2], swordPoints[6]],
+  [swordPoints[5], swordPoints[6]],
+  [swordPoints[5], swordPoints[7]],
+  [swordPoints[6], swordPoints[8]],
+  [swordPoints[7], swordPoints[8]],
+  [swordPoints[7], swordPoints[9]],
+  [swordPoints[8], swordPoints[9]],
+];
+
 for (let i =0; i < cubePoints.length; i++) {
   cubePoints[i].setColor('#f0f');
 }
+
+for (let i =0; i < swordPoints.length; i++) {
+  swordPoints[i].setColor('#0ff');
+}
+
+let currentLines = cubeLines;
+let currentModel = 'cube';
+
+const toggleModel = () => {
+  if (currentModel === 'cube') {
+    currentModel = 'sword';
+    currentLines = swordLines;
+    modelToggleBtn.textContent = 'Show Cube';
+  } else {
+    currentModel = 'cube';
+    currentLines = cubeLines;
+    modelToggleBtn.textContent = 'Show Sword';
+  }
+};
+
+modelToggleBtn.addEventListener('click', toggleModel);
 
 setInterval(updatePoints, 15);
 
