@@ -46,7 +46,7 @@
       font-size: 12px;
     }
     #press-hint.hidden { display: none; }
-    #model-toggle {
+    #model-select {
       position: absolute;
       right: 10px;
       bottom: 10px;
@@ -83,7 +83,12 @@
       Mouse wheel or pinch: zoom in/out
     </div>
   </div>
-  <button id="model-toggle">Show Cube</button>
+  <select id="model-select">
+    <option value="sword">Sword</option>
+    <option value="cube">Cube</option>
+    <option value="sphere">Sphere</option>
+    <option value="star">Star</option>
+  </select>
   <div id="stats-overlay" class="hidden"></div>
   <div id="press-hint">Press H for help</div>
   <script src="./point3d.js"></script>
