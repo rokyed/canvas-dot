@@ -51,14 +51,20 @@ class Canvas3D {
   }
 
   drawPoints(points, clearScreen) {
-    if(clearScreen)
+    if (clearScreen)
       this.clearScreen();
 
+    const sorted = [...points].sort((a, b) => {
+      a.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+      b.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+      return b.getDistanceFromCamera(this.worldRotation) - a.getDistanceFromCamera(this.worldRotation);
+    });
+
     if (this.settings.batch) {
-      this.drawBatchedPoints(points, clearScreen);
+      this.drawBatchedPoints(sorted, false);
     } else {
-      for (let i = 0; i < points.length; i++) {
-        this.drawPoint(points[i]);
+      for (let i = 0; i < sorted.length; i++) {
+        this.drawPoint(sorted[i]);
       }
     }
   }
@@ -89,8 +95,18 @@ class Canvas3D {
     if (clearScreen)
       this.clearScreen();
 
-    for (let i =0; i< lines.length; i++) {
-      this.drawLine(lines[i][0], lines[i][1]);
+    const sorted = [...lines].sort((a, b) => {
+      a[0].setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+      a[1].setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+      b[0].setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+      b[1].setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+      const distA = (a[0].getDistanceFromCamera(this.worldRotation) + a[1].getDistanceFromCamera(this.worldRotation)) / 2;
+      const distB = (b[0].getDistanceFromCamera(this.worldRotation) + b[1].getDistanceFromCamera(this.worldRotation)) / 2;
+      return distB - distA;
+    });
+
+    for (let i = 0; i < sorted.length; i++) {
+      this.drawLine(sorted[i][0], sorted[i][1]);
     }
   }
 
