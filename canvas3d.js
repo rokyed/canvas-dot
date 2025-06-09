@@ -132,7 +132,9 @@ class Canvas3D {
     point.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
     this.stats.drawnPoints ++;
     let p2d = point.getRotated2D(this.worldRotation, this.zoom);
-    this.fillRectWithScreenTest(Math.round(p2d.x), Math.round(p2d.y), 1, 1);
+    let size = point.getScale(this.worldRotation, this.zoom);
+    size = Math.max(1, size);
+    this.fillRectWithScreenTest(Math.round(p2d.x - size/2), Math.round(p2d.y - size/2), Math.round(size), Math.round(size));
   }
 
   fillRectWithScreenTest(x,y,w,h) {
