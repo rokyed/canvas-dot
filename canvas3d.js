@@ -115,6 +115,9 @@ class Canvas3D {
   drawLine(pointA, pointB) {
     pointA.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
     pointB.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+    if (this.settings.occlusion && (pointA.isBehindCamera(this.worldRotation) || pointB.isBehindCamera(this.worldRotation))) {
+      return;
+    }
     let pA = pointA.getRotated2D(this.worldRotation, this.zoom);
     let pB = pointB.getRotated2D(this.worldRotation, this.zoom);
     this.stats.drawnLines ++;
@@ -148,6 +151,9 @@ class Canvas3D {
 
   drawPointNoColor(point) {
     point.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+    if (this.settings.occlusion && point.isBehindCamera(this.worldRotation)) {
+      return;
+    }
     this.stats.drawnPoints ++;
     let p2d = point.getRotated2D(this.worldRotation, this.zoom);
     let size = point.getScale(this.worldRotation, this.zoom) * this.pointSizeScale;

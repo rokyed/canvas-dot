@@ -70,6 +70,13 @@ class Point3D {
     }
   }
 
+  isBehindCamera(worldRotation) {
+    let rot = this.rotateAroundX(this.x, this.y, this.z, worldRotation.x);
+    rot = this.rotateAroundY(rot.x, rot.y, rot.z, worldRotation.y);
+    rot = this.rotateAroundZ(rot.x, rot.y, rot.z, worldRotation.z);
+    return (rot.z + this.offsetZ) > 0;
+  }
+
 
   getRotated2D (worldRotation, zoom = 1) {
     let rot = this.rotateAroundX(this.x, this.y, this.z, worldRotation.x);
