@@ -43,6 +43,7 @@ let lastMouseY = 0;
 let pinchStartDist = 0;
 let pinchStartZoom = 0;
 const MOUSE_SENSITIVITY = 0.2;
+const ZOOM_SENSITIVITY = 10;
 const toggleHelp = () => {
   helpVisible = !helpVisible;
   if (helpVisible) {
@@ -115,9 +116,9 @@ document.addEventListener('mousemove', (e) => {
 document.addEventListener('wheel', (e) => {
   e.preventDefault();
   if (e.deltaY < 0) {
-    C3D.zoom += 1;
+    C3D.zoom += ZOOM_SENSITIVITY;
   } else {
-    C3D.zoom -= 1;
+    C3D.zoom -= ZOOM_SENSITIVITY;
   }
 });
 
@@ -180,9 +181,9 @@ window.addEventListener('keydown', (e) => {
   } else if (e.code == 'NumpadAdd' || e.code == 'KeyZ') {
     C3D.cameraPoint.translate(0,0,1);
   } else if (e.code == 'KeyX') {
-    C3D.zoom -= 1;
+    C3D.zoom -= ZOOM_SENSITIVITY;
   } else if (e.code == 'KeyS') {
-    C3D.zoom += 1;
+    C3D.zoom += ZOOM_SENSITIVITY;
   } else if (e.code == 'KeyQ') {
     enableRotateX = !enableRotateX;
   } else if (e.code == 'KeyW') {
