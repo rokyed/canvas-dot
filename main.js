@@ -441,16 +441,18 @@ const createPyramid = (size = 2, height = 2) => {
 const { points: pyramidPoints, lines: pyramidLines } = createPyramid(2, 2);
 pyramidPoints.forEach(p => p.setColor('#0f0'));
 
-// create a simple swinging pendulum
+// create a simple swinging pendulum with a spherical bob
 const createPendulum = (length = 4, bobSize = 0.5) => {
   const pivot = new Point3D(0, 0, 0);
-  const bob = new Point3D(0, -length, 0);
-  const left = new Point3D(-bobSize, -length, 0);
-  const right = new Point3D(bobSize, -length, 0);
-  const points = [pivot, bob, left, right];
+  const bobCenter = new Point3D(0, -length, 0);
+  // build a small sphere for the bob
+  const { points: bobPoints, lines: bobLines } = createSphere(8, 8, bobSize);
+  // offset sphere points to the end of the pendulum arm
+  bobPoints.forEach(p => p.translate(0, -length, 0));
+  const points = [pivot, bobCenter, ...bobPoints];
   const lines = [
-    [pivot, bob],
-    [left, right]
+    [pivot, bobCenter],
+    ...bobLines
   ];
   return { points, lines };
 };
