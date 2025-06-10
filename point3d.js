@@ -1,6 +1,6 @@
 'use strict';
 
-class Point3D {
+export default class Point3D {
   x = 0;
   y = 0;
   z = 0;
