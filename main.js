@@ -239,6 +239,10 @@ const raf = (timestamp) => {
   if (enableRotateZ)
     C3D.rotateZ(10 * delta);
 
+  if (modelSelect.value === 'pendulum') {
+    updatePendulum(delta);
+  }
+
 try {
   C3D.settings.occlusion = enableOcclusion;
   C3D.settings.hwLines = enableHWLineRen;
@@ -437,6 +441,48 @@ const createPyramid = (size = 2, height = 2) => {
 const { points: pyramidPoints, lines: pyramidLines } = createPyramid(2, 2);
 pyramidPoints.forEach(p => p.setColor('#0f0'));
 
+// create a simple swinging pendulum
+const createPendulum = (length = 4, bobSize = 0.5) => {
+  const pivot = new Point3D(0, 0, 0);
+  const bob = new Point3D(0, -length, 0);
+  const left = new Point3D(-bobSize, -length, 0);
+  const right = new Point3D(bobSize, -length, 0);
+  const points = [pivot, bob, left, right];
+  const lines = [
+    [pivot, bob],
+    [left, right]
+  ];
+  return { points, lines };
+};
+
+const { points: pendulumPoints, lines: pendulumLines } = createPendulum(4, 1);
+pendulumPoints.forEach(p => p.setColor('#fff'));
+const pendulumBase = pendulumPoints.map(p => ({ x: p.x, y: p.y, z: p.z }));
+let pendulumAngle = 0;
+let pendulumDirection = 1;
+const pendulumMaxAngle = 30;
+const pendulumSpeed = 60;
+
+const updatePendulum = (delta) => {
+  pendulumAngle += pendulumDirection * pendulumSpeed * delta;
+  if (pendulumAngle > pendulumMaxAngle) {
+    pendulumAngle = pendulumMaxAngle;
+    pendulumDirection = -1;
+  } else if (pendulumAngle < -pendulumMaxAngle) {
+    pendulumAngle = -pendulumMaxAngle;
+    pendulumDirection = 1;
+  }
+  const rad = pendulumAngle * Math.PI / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  for (let i = 0; i < pendulumPoints.length; i++) {
+    const b = pendulumBase[i];
+    const x = b.x * cos - b.y * sin;
+    const y = b.x * sin + b.y * cos;
+    pendulumPoints[i].setPosition(x, y, b.z);
+  }
+};
+
 let currentLines = swordLines;
 
 const updateModel = () => {
@@ -449,6 +495,8 @@ const updateModel = () => {
     currentLines = starLines;
   } else if (value === 'pyramid') {
     currentLines = pyramidLines;
+  } else if (value === 'pendulum') {
+    currentLines = pendulumLines;
   } else {
     currentLines = swordLines;
   }
