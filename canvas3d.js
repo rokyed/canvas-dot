@@ -1,6 +1,8 @@
 'use strict';
 
-class Canvas3D {
+import Point3D from './point3d.js';
+
+export default class Canvas3D {
   canvasElement = null;
   ctx = null;
   width = 0;

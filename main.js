@@ -1,5 +1,14 @@
 'use strict';
 
+import Canvas3D from './canvas3d.js';
+import Point3D from './point3d.js';
+import { createCube } from './models/cube.js';
+import { createSword } from './models/sword.js';
+import { createSphere } from './models/sphere.js';
+import { createStar } from './models/star.js';
+import { createPyramid } from './models/pyramid.js';
+import { createPendulum } from './models/pendulum.js';
+
 const RENDER_SCALE = 2; // canvas is scaled up 2x so rendering is at half resolution
 
 const getScreenSize = () => ({
@@ -19,7 +28,6 @@ window.C3D = new Canvas3D(
   200
 );
 let arr = [];
-let cubePoints  = [];
 let colors = ['red', 'blue','green','yellow','aqua','magenta','cyan','purple'];
 let enableRotateX = false;
 let enableRotateY = true;
@@ -287,203 +295,15 @@ for (let i = 0; i < 0; i++) {
   updatePoint(point);
   arr.push(point);
 }
-let cubeCenter = new Point3D(0,-3,0);
 
-cubePoints.push(new Point3D(-1+cubeCenter.x,1+cubeCenter.y, 1+cubeCenter.z));
-cubePoints.push(new Point3D(-1+cubeCenter.x,1+cubeCenter.y, -1+cubeCenter.z));
-cubePoints.push(new Point3D(-1+cubeCenter.x,-1+cubeCenter.y, 1+cubeCenter.z));
-cubePoints.push(new Point3D(-1+cubeCenter.x,-1+cubeCenter.y, -1+cubeCenter.z));
-cubePoints.push(new Point3D(1+cubeCenter.x,-1+cubeCenter.y, -1+cubeCenter.z));
-cubePoints.push(new Point3D(1+cubeCenter.x,1+cubeCenter.y, -1+cubeCenter.z));
-cubePoints.push(new Point3D(1+cubeCenter.x,-1+cubeCenter.y, 1+cubeCenter.z));
-cubePoints.push(new Point3D(1+cubeCenter.x,1+cubeCenter.y, 1+cubeCenter.z));
-
-let cubeLines = [
-  [cubePoints[0], cubePoints[1]],
-  [cubePoints[0], cubePoints[7]],
-  [cubePoints[0], cubePoints[2]],
-  [cubePoints[6], cubePoints[7]],
-  [cubePoints[6], cubePoints[2]],
-  [cubePoints[6], cubePoints[4]],
-  [cubePoints[3], cubePoints[1]],
-  [cubePoints[3], cubePoints[2]],
-  [cubePoints[3], cubePoints[4]],
-  [cubePoints[5], cubePoints[1]],
-  [cubePoints[5], cubePoints[7]],
-  [cubePoints[5], cubePoints[4]],
-]
-
-// base points for a flat sword model
-const baseSwordPoints = [];
-baseSwordPoints.push(new Point3D(0, 3, 0));     // tip
-baseSwordPoints.push(new Point3D(-0.2, 1, 0));  // left blade base
-baseSwordPoints.push(new Point3D(0.2, 1, 0));   // right blade base
-baseSwordPoints.push(new Point3D(-1, 0.8, 0));  // crossguard left end
-baseSwordPoints.push(new Point3D(1, 0.8, 0));   // crossguard right end
-baseSwordPoints.push(new Point3D(-0.2, 0, 0));  // handle left top
-baseSwordPoints.push(new Point3D(0.2, 0, 0));   // handle right top
-baseSwordPoints.push(new Point3D(-0.2, -1.5, 0)); // handle left bottom
-baseSwordPoints.push(new Point3D(0.2, -1.5, 0));  // handle right bottom
-baseSwordPoints.push(new Point3D(0, -1.7, 0));  // pommel
-
-// give the sword some thickness by duplicating points on the Z axis
-const SWORD_THICKNESS = 0.2;
-const HALF_THICKNESS = SWORD_THICKNESS / 2;
-const swordFrontPoints = baseSwordPoints.map(p => new Point3D(p.x, p.y, -HALF_THICKNESS));
-const swordBackPoints = baseSwordPoints.map(p => new Point3D(p.x, p.y, HALF_THICKNESS));
-
-let swordPoints = [...swordFrontPoints, ...swordBackPoints];
-
-const baseSwordLines = [
-  [0, 1], [0, 2], [1, 2], [1, 3], [2, 4], [3, 4],
-  [1, 5], [2, 6], [5, 6], [5, 7], [6, 8], [7, 8],
-  [7, 9], [8, 9]
-];
-
-let swordLines = [];
-// front face lines
-for (const [a, b] of baseSwordLines) {
-  swordLines.push([swordPoints[a], swordPoints[b]]);
-}
-// back face lines
-for (const [a, b] of baseSwordLines) {
-  swordLines.push([swordPoints[a + baseSwordPoints.length], swordPoints[b + baseSwordPoints.length]]);
-}
-// side lines connecting front and back points
-for (let i = 0; i < baseSwordPoints.length; i++) {
-  swordLines.push([swordPoints[i], swordPoints[i + baseSwordPoints.length]]);
-}
-
-for (let i =0; i < cubePoints.length; i++) {
-  cubePoints[i].setColor('#f0f');
-}
-
-for (let i =0; i < swordPoints.length; i++) {
-  swordPoints[i].setColor('#0ff');
-}
-
-// create a sphere model with 16 segments and 16 loops
-const createSphere = (segments = 16, loops = 16, radius = 2) => {
-  const points = [];
-  const lines = [];
-  for (let i = 0; i <= loops; i++) {
-    const phi = (i / loops) * Math.PI - Math.PI / 2;
-    const cosPhi = Math.cos(phi);
-    const sinPhi = Math.sin(phi);
-    for (let j = 0; j <= segments; j++) {
-      const theta = (j / segments) * Math.PI * 2;
-      const x = radius * cosPhi * Math.cos(theta);
-      const y = radius * sinPhi;
-      const z = radius * cosPhi * Math.sin(theta);
-      points.push(new Point3D(x, y, z));
-    }
-  }
-  for (let i = 0; i < loops; i++) {
-    for (let j = 0; j < segments; j++) {
-      const a = i * (segments + 1) + j;
-      const b = a + 1;
-      const c = a + (segments + 1);
-      lines.push([points[a], points[b]]);
-      lines.push([points[a], points[c]]);
-    }
-  }
-  return { points, lines };
-};
-
+const { points: cubePoints, lines: cubeLines } = createCube();
+const { points: swordPoints, lines: swordLines } = createSword();
 const { points: spherePoints, lines: sphereLines } = createSphere(16, 16, 2);
 spherePoints.forEach(p => p.setColor('#ff0'));
-
-const createStar = (points = 5, outerRadius = 2, innerRadius = 1, thickness = 0.5) => {
-  const base = [];
-  for (let i = 0; i < points * 2; i++) {
-    const angle = (i * Math.PI) / points;
-    const r = i % 2 === 0 ? outerRadius : innerRadius;
-    base.push(new Point3D(r * Math.cos(angle), r * Math.sin(angle), 0));
-  }
-  const front = base.map(p => new Point3D(p.x, p.y, -thickness / 2));
-  const back = base.map(p => new Point3D(p.x, p.y, thickness / 2));
-  const all = [...front, ...back];
-  const lines = [];
-  const len = base.length;
-  for (let i = 0; i < len; i++) {
-    const next = (i + 1) % len;
-    lines.push([all[i], all[next]]);
-  }
-  for (let i = 0; i < len; i++) {
-    const next = (i + 1) % len;
-    lines.push([all[i + len], all[next + len]]);
-  }
-  for (let i = 0; i < len; i++) {
-    lines.push([all[i], all[i + len]]);
-  }
-  return { points: all, lines };
-};
-
 const { points: starPoints, lines: starLines } = createStar(5, 2, 1, 0.4);
 starPoints.forEach(p => p.setColor('#fa0'));
-
-// create a simple pyramid with a square base
-const createPyramid = (size = 2, height = 2) => {
-  const half = size / 2;
-  const p0 = new Point3D(-half, 0, half);
-  const p1 = new Point3D(half, 0, half);
-  const p2 = new Point3D(half, 0, -half);
-  const p3 = new Point3D(-half, 0, -half);
-  const apex = new Point3D(0, height, 0);
-  const points = [p0, p1, p2, p3, apex];
-  const lines = [
-    [p0, p1], [p1, p2], [p2, p3], [p3, p0],
-    [p0, apex], [p1, apex], [p2, apex], [p3, apex]
-  ];
-  return { points, lines };
-};
-
 const { points: pyramidPoints, lines: pyramidLines } = createPyramid(2, 2);
-pyramidPoints.forEach(p => p.setColor('#0f0'));
-
-// create a simple swinging pendulum with a spherical bob
-const createPendulum = (length = 4, bobSize = 0.5) => {
-  const pivot = new Point3D(0, 0, 0);
-  const bobCenter = new Point3D(0, -length, 0);
-  // build a small sphere for the bob
-  const { points: bobPoints, lines: bobLines } = createSphere(8, 8, bobSize);
-  // offset sphere points to the end of the pendulum arm
-  bobPoints.forEach(p => p.translate(0, -length, 0));
-  const points = [pivot, bobCenter, ...bobPoints];
-  const lines = [
-    [pivot, bobCenter],
-    ...bobLines
-  ];
-  return { points, lines };
-};
-
-const { points: pendulumPoints, lines: pendulumLines } = createPendulum(4, 1);
-pendulumPoints.forEach(p => p.setColor('#fff'));
-const pendulumBase = pendulumPoints.map(p => ({ x: p.x, y: p.y, z: p.z }));
-let pendulumAngle = 0;
-let pendulumDirection = 1;
-const pendulumMaxAngle = 30;
-const pendulumSpeed = 60;
-
-const updatePendulum = (delta) => {
-  pendulumAngle += pendulumDirection * pendulumSpeed * delta;
-  if (pendulumAngle > pendulumMaxAngle) {
-    pendulumAngle = pendulumMaxAngle;
-    pendulumDirection = -1;
-  } else if (pendulumAngle < -pendulumMaxAngle) {
-    pendulumAngle = -pendulumMaxAngle;
-    pendulumDirection = 1;
-  }
-  const rad = pendulumAngle * Math.PI / 180;
-  const cos = Math.cos(rad);
-  const sin = Math.sin(rad);
-  for (let i = 0; i < pendulumPoints.length; i++) {
-    const b = pendulumBase[i];
-    const x = b.x * cos - b.y * sin;
-    const y = b.x * sin + b.y * cos;
-    pendulumPoints[i].setPosition(x, y, b.z);
-  }
-};
+const { points: pendulumPoints, lines: pendulumLines, update: updatePendulum } = createPendulum(4, 1);
 
 let currentLines = swordLines;
 
