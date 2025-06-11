@@ -210,11 +210,34 @@ export default class Canvas3D {
   completeScreenDraw(obj = {}) {
     this.start();
     this.clearScreen();
-    if (obj.lines)
-      this.drawLines(obj.lines, false);
+    const hasPoints = Array.isArray(obj.points);
+    const hasLines = Array.isArray(obj.lines);
 
-    if (obj.points)
-      this.drawPoints(obj.points, false);
+    if (hasPoints && hasLines) {
+      const elements = [];
+      for (const [a, b] of obj.lines) {
+        a.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+        b.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+        const dist = (a.getDistanceFromCamera(this.worldRotation) +
+          b.getDistanceFromCamera(this.worldRotation)) / 2;
+        elements.push({ type: 'line', a, b, dist });
+      }
+      for (const p of obj.points) {
+        p.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+        const dist = p.getDistanceFromCamera(this.worldRotation);
+        elements.push({ type: 'point', p, dist });
+      }
+      elements.sort((x, y) => y.dist - x.dist);
+      for (const el of elements) {
+        if (el.type === 'line') this.drawLine(el.a, el.b);
+        else this.drawPoint(el.p);
+      }
+    } else {
+      if (hasLines)
+        this.drawLines(obj.lines, false);
+      if (hasPoints)
+        this.drawPoints(obj.points, false);
+    }
 
     if (obj.texts)
       this.drawTexts(obj.texts, false);
