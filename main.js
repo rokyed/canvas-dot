@@ -6,6 +6,7 @@ import { createCube } from './models/cube.js';
 import { createSword } from './models/sword.js';
 import { createSphere } from './models/sphere.js';
 import { createStar } from './models/star.js';
+import { createHeart } from './models/heart.js';
 import { createPyramid } from './models/pyramid.js';
 import { createPendulum } from './models/pendulum.js';
 
@@ -309,6 +310,7 @@ const { points: spherePoints, lines: sphereLines } = createSphere(16, 16, 2);
 spherePoints.forEach(p => p.setColor('#ff0'));
 const { points: starPoints, lines: starLines } = createStar(5, 2, 1, 0.4);
 starPoints.forEach(p => p.setColor('#fa0'));
+const { points: heartPoints, lines: heartLines } = createHeart();
 const { points: pyramidPoints, lines: pyramidLines } = createPyramid(2, 2);
 const { points: pendulumPoints, lines: pendulumLines, update: updatePendulum } = createPendulum(4, 1);
 
@@ -322,6 +324,8 @@ const updateModel = () => {
     currentLines = sphereLines;
   } else if (value === 'star') {
     currentLines = starLines;
+  } else if (value === 'heart') {
+    currentLines = heartLines;
   } else if (value === 'pyramid') {
     currentLines = pyramidLines;
   } else if (value === 'pendulum') {
