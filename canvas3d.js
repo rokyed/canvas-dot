@@ -122,7 +122,7 @@ export default class Canvas3D {
   drawLine(pointA, pointB) {
     pointA.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
     pointB.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
-    if (this.settings.occlusion && (pointA.isBehindCamera(this.worldRotation) || pointB.isBehindCamera(this.worldRotation))) {
+    if (pointA.isBehindCamera(this.worldRotation) || pointB.isBehindCamera(this.worldRotation)) {
       return;
     }
     let pA = pointA.getRotated2D(this.worldRotation, this.zoom);
@@ -158,7 +158,7 @@ export default class Canvas3D {
 
   drawPointNoColor(point) {
     point.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
-    if (this.settings.occlusion && point.isBehindCamera(this.worldRotation)) {
+    if (point.isBehindCamera(this.worldRotation)) {
       return;
     }
     this.stats.drawnPoints ++;
