@@ -186,14 +186,21 @@ document.addEventListener('touchcancel', (e) => {
 
 window.addEventListener('keydown', (e) => {
   // console.log(e);
+  const walk = (forward, strafe) => {
+    const radY = C3D.worldRotation.y * Math.PI / 180;
+    const dx = Math.sin(radY) * forward + Math.cos(radY) * strafe;
+    const dz = Math.cos(radY) * forward - Math.sin(radY) * strafe;
+    C3D.cameraPoint.translate(dx, 0, -dz);
+  };
+
   if (e.code == 'ArrowLeft') {
-    C3D.cameraPoint.translate(-1, 0,0);
+    walk(0, -1);
   } else if (e.code  == 'ArrowUp') {
-    C3D.cameraPoint.translate(0,- 1,0);
+    walk(1, 0);
   } else if (e.code  == 'ArrowRight') {
-    C3D.cameraPoint.translate(1, 0,0);
+    walk(0, 1);
   } else if (e.code  == 'ArrowDown') {
-    C3D.cameraPoint.translate(0,1,0);
+    walk(-1, 0);
   } else if (e.code == 'NumpadSubtract' || e.code == 'KeyA') {
     C3D.cameraPoint.translate(0,0,-1);
   } else if (e.code == 'NumpadAdd' || e.code == 'KeyZ') {
