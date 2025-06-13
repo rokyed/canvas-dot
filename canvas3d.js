@@ -268,7 +268,7 @@ export default class Canvas3D {
   drawStats() {
     let size = 10;
     let i = 0;
-    this.ctx.strokeColor = '#0f0';
+    this.ctx.strokeStyle = '#0f0';
     this.ctx.fillStyle = '#0f0';
     this.ctx.font = `bold ${size}px arial`;
     let toDraw = {
