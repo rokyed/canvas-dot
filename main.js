@@ -71,7 +71,12 @@ if (editorEnabled) {
     });
   };
   addPointBtn.addEventListener('click', () => {
-    const p = new Point3D(parseFloat(xInput.value) || 0, parseFloat(yInput.value) || 0, parseFloat(zInput.value) || 0);
+    const p = new Point3D(
+      parseFloat(xInput.value) || 0,
+      parseFloat(yInput.value) || 0,
+      parseFloat(zInput.value) || 0,
+      true
+    );
     p.setColor(colorInput.value);
     arr.push(p);
     refreshEditorList();
@@ -335,9 +340,12 @@ const updatePoint = (point) => {
 }
 
 const updatePoints = () => {
+  if (arr.length === 0) return;
   for (let k = 0; k < 100; k++) {
-    let i = Math.floor(Math.random() * arr.length);
-    updatePoint(arr[i]);
+    const i = Math.floor(Math.random() * arr.length);
+    const point = arr[i];
+    if (!point || point.manual) continue;
+    updatePoint(point);
   }
 }
 
