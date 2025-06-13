@@ -11,6 +11,8 @@ export default class Canvas3D {
   zoom = 1;
   // scale factor applied to point sizes when rendering
   pointSizeScale = 0.1;
+  // scale factor applied to line widths when rendering
+  lineWidthScale = 0.05;
   worldRotation = new Point3D(0,0,0);
   stats = {};
   settings = {
@@ -127,11 +129,14 @@ export default class Canvas3D {
     }
     let pA = pointA.getRotated2D(this.worldRotation, this.zoom);
     let pB = pointB.getRotated2D(this.worldRotation, this.zoom);
+    const scaleA = pointA.getScale(this.worldRotation, this.zoom);
+    const scaleB = pointB.getScale(this.worldRotation, this.zoom);
+    const thickness = Math.max(1, ((scaleA + scaleB) / 2) * this.lineWidthScale);
     this.stats.drawnLines ++;
     if (this.settings.hwLines) {
       this.drawLineHardware(pA.x,pA.y, pB.x, pB.y, pointA.color);
     } else {
-      this.drawLineSoftware(pA.x,pA.y, pB.x, pB.y, pointA.color);
+      this.drawLineSoftware(pA.x,pA.y, pB.x, pB.y, pointA.color, thickness);
     }
   }
 
@@ -146,13 +151,16 @@ export default class Canvas3D {
     return a + ((b-a)* x);
   }
 
-  drawLineSoftware(x,y, x2,y2, color) {
+  drawLineSoftware(x,y, x2,y2, color, thickness = 1) {
     this.ctx.fillStyle = color;
     let maxPoints = Math.max(Math.abs(x2-x), Math.abs(y2-y));
     let diagLength = Math.sqrt(Math.pow(x2-x, 2) + Math.pow(y2-y, 2));
 
     for (let i = 0; i <= diagLength; i++) {
-      this.fillRectWithScreenTest(Math.round((this.lerp(x,x2,i/diagLength))), Math.round((this.lerp(y,y2,i/diagLength))),1,1);
+      const px = Math.round(this.lerp(x,x2,i/diagLength));
+      const py = Math.round(this.lerp(y,y2,i/diagLength));
+      const size = Math.round(thickness);
+      this.fillRectWithScreenTest(Math.round(px - size/2), Math.round(py - size/2), size, size);
     }
   }
 
