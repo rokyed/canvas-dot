@@ -106,18 +106,28 @@ export default class Canvas3D {
     if (clearScreen)
       this.clearScreen();
 
-    const sorted = [...lines].sort((a, b) => {
-      a[0].setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
-      a[1].setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
-      b[0].setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
-      b[1].setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
-      const distA = (a[0].getDistanceFromCamera(this.worldRotation) + a[1].getDistanceFromCamera(this.worldRotation)) / 2;
-      const distB = (b[0].getDistanceFromCamera(this.worldRotation) + b[1].getDistanceFromCamera(this.worldRotation)) / 2;
-      return distB - distA;
-    });
+    const segments = [];
 
-    for (let i = 0; i < sorted.length; i++) {
-      this.drawLine(sorted[i][0], sorted[i][1]);
+    for (const line of lines) {
+      if (!Array.isArray(line) || line.length < 2) continue;
+
+      for (let i = 0; i < line.length - 1; i++) {
+        const a = line[i];
+        const b = line[i + 1];
+        a.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+        b.setOffset(this.cameraPoint.x, this.cameraPoint.y, this.cameraPoint.z);
+        const dist = (
+          a.getDistanceFromCamera(this.worldRotation) +
+          b.getDistanceFromCamera(this.worldRotation)
+        ) / 2;
+        segments.push({ a, b, dist });
+      }
+    }
+
+    segments.sort((s1, s2) => s2.dist - s1.dist);
+
+    for (const { a, b } of segments) {
+      this.drawLine(a, b);
     }
   }
 
