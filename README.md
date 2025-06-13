@@ -13,6 +13,7 @@ It's made with plain new JS.
 - Choose between several 3D models like sword, cube, sphere, star, pyramid, the new heart and knot.
 - Points and lines are now rendered in proper depth order.
 - Objects behind the camera are never rendered.
+- Lines can now be defined using multiple points for a continuous path.
 
 ## Point Editor
 
