@@ -43,6 +43,43 @@ const helpOverlay = document.getElementById('help-overlay');
 const statsOverlay = document.getElementById('stats-overlay');
 const pressHint = document.getElementById('press-hint');
 const modelSelect = document.getElementById('model-select');
+const editorOverlay = document.getElementById('editor-overlay');
+const xInput = document.getElementById('edit-x');
+const yInput = document.getElementById('edit-y');
+const zInput = document.getElementById('edit-z');
+const colorInput = document.getElementById('edit-color');
+const addPointBtn = document.getElementById('add-point-btn');
+const pointsList = document.getElementById('points-list');
+const urlParams = new URLSearchParams(window.location.search);
+const editorEnabled = urlParams.has('edit');
+let refreshEditorList = () => {};
+if (editorEnabled) {
+  editorOverlay.classList.remove('hidden');
+  refreshEditorList = () => {
+    pointsList.innerHTML = '';
+    arr.forEach((p, idx) => {
+      const li = document.createElement('li');
+      li.textContent = `#${idx} x:${p.x.toFixed(2)} y:${p.y.toFixed(2)} z:${p.z.toFixed(2)} ${p.color}`;
+      const btn = document.createElement('button');
+      btn.textContent = 'X';
+      btn.addEventListener('click', () => {
+        arr.splice(idx, 1);
+        refreshEditorList();
+      });
+      li.appendChild(btn);
+      pointsList.appendChild(li);
+    });
+  };
+  addPointBtn.addEventListener('click', () => {
+    const p = new Point3D(parseFloat(xInput.value) || 0, parseFloat(yInput.value) || 0, parseFloat(zInput.value) || 0);
+    p.setColor(colorInput.value);
+    arr.push(p);
+    refreshEditorList();
+  });
+  refreshEditorList();
+} else {
+  editorOverlay.classList.add('hidden');
+}
 pressHint.classList.add('hidden');
 let helpVisible = true;
 let mouseDown = false;
@@ -229,8 +266,10 @@ window.addEventListener('keydown', (e) => {
       updatePoint(point);
       arr.push(point);
     }
+    refreshEditorList();
   } else if (e.code == 'KeyV') {
     arr.splice(-10);
+    refreshEditorList();
   } else if (e.code == 'KeyB') {
     enableBatchPoints = !enableBatchPoints;
   } else if (e.code == 'KeyO') {
