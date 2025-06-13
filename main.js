@@ -58,8 +58,9 @@ let refreshEditorList = () => {};
 if (editorEnabled) {
   editorOverlay.classList.remove('hidden');
   refreshEditorList = () => {
-    pointsList.innerHTML = '';
-    pointsSelect.innerHTML = '';
+    const prevIdx = parseInt(pointsSelect.value)
+    pointsList.innerHTML = ''
+    pointsSelect.innerHTML = ''
     arr.forEach((p, idx) => {
       const li = document.createElement('li');
       li.textContent = `#${idx} x:${p.x.toFixed(2)} y:${p.y.toFixed(2)} z:${p.z.toFixed(2)} ${p.color}`;
@@ -77,6 +78,12 @@ if (editorEnabled) {
       option.textContent = `#${idx}`;
       pointsSelect.appendChild(option);
     });
+    if (!isNaN(prevIdx) && prevIdx < arr.length) {
+      pointsSelect.value = prevIdx
+    } else if (arr.length > 0) {
+      pointsSelect.value = arr.length - 1
+    }
+    pointsSelect.dispatchEvent(new Event('change'))
   };
   pointsSelect.addEventListener('change', () => {
     const idx = parseInt(pointsSelect.value);
