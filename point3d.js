@@ -11,11 +11,13 @@ export default class Point3D {
   offsetY = 0;
   offsetZ = 0;
   color = 'blue';
+  manual = false;
 
-  constructor(x, y, z) {
+  constructor(x, y, z, manual = false) {
     this.x = x;
     this.y = y;
     this.z = z;
+    this.manual = manual;
   }
 
   translate(x, y, z) {
