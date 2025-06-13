@@ -9,6 +9,7 @@ import { createStar } from './models/star.js';
 import { createHeart } from './models/heart.js';
 import { createPyramid } from './models/pyramid.js';
 import { createPendulum } from './models/pendulum.js';
+import { createKnot } from './models/knot.js';
 
 const RENDER_SCALE = 2; // canvas is scaled up 2x so rendering is at half resolution
 
@@ -258,6 +259,9 @@ const raf = (timestamp) => {
   if (modelSelect.value === 'pendulum') {
     updatePendulum(delta);
   }
+  if (modelSelect.value === 'knot') {
+    updateKnot(delta);
+  }
 
 try {
   C3D.settings.occlusion = enableOcclusion;
@@ -313,6 +317,7 @@ starPoints.forEach(p => p.setColor('#fa0'));
 const { points: heartPoints, lines: heartLines } = createHeart();
 const { points: pyramidPoints, lines: pyramidLines } = createPyramid(2, 2);
 const { points: pendulumPoints, lines: pendulumLines, update: updatePendulum } = createPendulum(4, 1);
+const { points: knotPoints, lines: knotLines, update: updateKnot } = createKnot();
 
 let currentLines = swordLines;
 
@@ -330,6 +335,8 @@ const updateModel = () => {
     currentLines = pyramidLines;
   } else if (value === 'pendulum') {
     currentLines = pendulumLines;
+  } else if (value === 'knot') {
+    currentLines = knotLines;
   } else {
     currentLines = swordLines;
   }
