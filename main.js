@@ -163,7 +163,8 @@ document.addEventListener('touchmove', (e) => {
       e.touches[0].clientY - e.touches[1].clientY
     );
     const delta = dist - pinchStartDist;
-    C3D.setZoom(pinchStartZoom + delta * 0.01);
+    // Scale pinch zoom much more aggressively so it matches mouse wheel zoom
+    C3D.setZoom(pinchStartZoom + delta * 0.01 * 100);
   }
   e.preventDefault();
 }, { passive: false });
