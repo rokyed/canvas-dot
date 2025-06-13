@@ -14,4 +14,8 @@ It's made with plain new JS.
 - Points and lines are now rendered in proper depth order.
 - Objects behind the camera are never rendered.
 
+## Point Editor
+
+Add `?edit` to the URL to enable the editor overlay. The editor lets you add new points, edit the selected point's position or color, and delete points from the list.
+
 Check it here: [https://rokyed.github.io/canvas-dot/](https://rokyed.github.io/canvas-dot/)

@@ -49,6 +49,7 @@ const yInput = document.getElementById('edit-y');
 const zInput = document.getElementById('edit-z');
 const colorInput = document.getElementById('edit-color');
 const addPointBtn = document.getElementById('add-point-btn');
+const updatePointBtn = document.getElementById('update-point-btn');
 const pointsList = document.getElementById('points-list');
 const pointsSelect = document.getElementById('points-select');
 const urlParams = new URLSearchParams(window.location.search);
@@ -85,6 +86,20 @@ if (editorEnabled) {
       yInput.value = p.y.toFixed(2);
       zInput.value = p.z.toFixed(2);
       colorInput.value = p.color;
+    }
+  });
+  updatePointBtn.addEventListener('click', () => {
+    const idx = parseInt(pointsSelect.value);
+    const p = arr[idx];
+    if (p) {
+      p.setPosition(
+        parseFloat(xInput.value) || 0,
+        parseFloat(yInput.value) || 0,
+        parseFloat(zInput.value) || 0
+      );
+      p.setColor(colorInput.value);
+      refreshEditorList();
+      pointsSelect.value = idx;
     }
   });
   addPointBtn.addEventListener('click', () => {
