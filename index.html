@@ -69,6 +69,15 @@
       max-height: 40%;
       overflow-y: auto;
     }
+    #points-select {
+      width: 100%;
+      margin-top: 5px;
+      background: rgba(0,0,0,0.7);
+      color: #0f0;
+      border: 1px solid #0f0;
+      font-family: monospace;
+      font-size: 12px;
+    }
     #editor-overlay.hidden { display: none; }
     </style>
     <meta charset="utf-8">
@@ -116,6 +125,7 @@
       <button id="add-point-btn">Add</button>
     </div>
     <ul id="points-list" style="list-style:none;padding:0;margin:0"></ul>
+    <select id="points-select" size="5" style="width:100%;margin-top:5px"></select>
   </div>
   <div id="press-hint">Press H for help</div>
   <script type="module" src="./main.js"></script>

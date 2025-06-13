@@ -50,6 +50,7 @@ const zInput = document.getElementById('edit-z');
 const colorInput = document.getElementById('edit-color');
 const addPointBtn = document.getElementById('add-point-btn');
 const pointsList = document.getElementById('points-list');
+const pointsSelect = document.getElementById('points-select');
 const urlParams = new URLSearchParams(window.location.search);
 const editorEnabled = urlParams.has('edit');
 let refreshEditorList = () => {};
@@ -57,6 +58,7 @@ if (editorEnabled) {
   editorOverlay.classList.remove('hidden');
   refreshEditorList = () => {
     pointsList.innerHTML = '';
+    pointsSelect.innerHTML = '';
     arr.forEach((p, idx) => {
       const li = document.createElement('li');
       li.textContent = `#${idx} x:${p.x.toFixed(2)} y:${p.y.toFixed(2)} z:${p.z.toFixed(2)} ${p.color}`;
@@ -68,8 +70,23 @@ if (editorEnabled) {
       });
       li.appendChild(btn);
       pointsList.appendChild(li);
+
+      const option = document.createElement('option');
+      option.value = idx;
+      option.textContent = `#${idx}`;
+      pointsSelect.appendChild(option);
     });
   };
+  pointsSelect.addEventListener('change', () => {
+    const idx = parseInt(pointsSelect.value);
+    const p = arr[idx];
+    if (p) {
+      xInput.value = p.x.toFixed(2);
+      yInput.value = p.y.toFixed(2);
+      zInput.value = p.z.toFixed(2);
+      colorInput.value = p.color;
+    }
+  });
   addPointBtn.addEventListener('click', () => {
     const p = new Point3D(
       parseFloat(xInput.value) || 0,
