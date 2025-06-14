@@ -57,6 +57,17 @@
       font-family: monospace;
       font-size: 12px;
     }
+    #draw-toggle {
+      position: absolute;
+      right: 10px;
+      bottom: 40px;
+      padding: 5px 10px;
+      background: rgba(0,0,0,0.7);
+      color: #0f0;
+      border: 1px solid #0f0;
+      font-family: monospace;
+      font-size: 12px;
+    }
     #editor-overlay {
       position: absolute;
       left: 10px;
@@ -97,6 +108,7 @@
         R: hardware lines<br>
         M: toggle stats<br>
         F/V: add/remove points<br>
+        Draw Mode button: hold mouse to draw lines<br>
         B: batch points<br>
         O: toggle screen occlusion (default on)<br>
         L: fullscreen<br>
@@ -113,8 +125,9 @@
     <option value="heart">Heart</option>
     <option value="pyramid">Pyramid</option>
     <option value="pendulum">Pendulum</option>
-    <option value="knot">Knot</option>
-  </select>
+  <option value="knot">Knot</option>
+</select>
+<button id="draw-toggle">Draw: Off</button>
   <div id="stats-overlay" class="hidden"></div>
   <div id="editor-overlay" class="hidden">
     <div>

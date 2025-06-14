@@ -30,6 +30,10 @@ window.C3D = new Canvas3D(
   200
 );
 let arr = [];
+const userLines = [];
+let drawMode = false;
+let drawing = false;
+let currentLine = null;
 let colors = ['red', 'blue','green','yellow','aqua','magenta','cyan','purple'];
 let enableRotateX = false;
 let enableRotateY = true;
@@ -43,6 +47,7 @@ const helpOverlay = document.getElementById('help-overlay');
 const statsOverlay = document.getElementById('stats-overlay');
 const pressHint = document.getElementById('press-hint');
 const modelSelect = document.getElementById('model-select');
+const drawToggleBtn = document.getElementById('draw-toggle');
 const editorOverlay = document.getElementById('editor-overlay');
 const xInput = document.getElementById('edit-x');
 const yInput = document.getElementById('edit-y');
@@ -152,6 +157,23 @@ const toggleStats = () => {
   }
 };
 
+const toggleDrawMode = () => {
+  drawMode = !drawMode;
+  drawToggleBtn.textContent = drawMode ? 'Draw: On' : 'Draw: Off';
+};
+
+const screenToWorld = (sx, sy, planeZ = 0) => {
+  const factor = (planeZ + C3D.cameraPoint.z) / C3D.zoom;
+  const temp = new Point3D(0, 0, 0);
+  let x = (sx - C3D.cameraPoint.x) * factor;
+  let y = (sy - C3D.cameraPoint.y) * factor;
+  let z = planeZ;
+  let rot = temp.rotateAroundZ(x, y, z, -C3D.worldRotation.z);
+  rot = temp.rotateAroundY(rot.x, rot.y, rot.z, -C3D.worldRotation.y);
+  rot = temp.rotateAroundX(rot.x, rot.y, rot.z, -C3D.worldRotation.x);
+  return new Point3D(rot.x, rot.y, rot.z);
+};
+
 let fullscreen = false;
 
 const updateScreenSize = () => {
@@ -179,27 +201,50 @@ window.addEventListener('resize', updateScreenSize);
 window.C3D.cameraPoint.translate(0,0,-10)
 
 document.addEventListener('mousedown', (e) => {
-  mouseDown = true;
-  lastMouseX = e.clientX;
-  lastMouseY = e.clientY;
+  if (drawMode) {
+    drawing = true;
+    const x = e.clientX / RENDER_SCALE;
+    const y = e.clientY / RENDER_SCALE;
+    currentLine = [screenToWorld(x, y, 0)];
+    userLines.push(currentLine);
+  } else {
+    mouseDown = true;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+  }
 });
 
 document.addEventListener('mouseup', () => {
+  if (drawMode) {
+    drawing = false;
+    currentLine = null;
+  }
   mouseDown = false;
 });
 
 document.addEventListener('mouseleave', () => {
+  if (drawMode) {
+    drawing = false;
+    currentLine = null;
+  }
   mouseDown = false;
 });
 
 document.addEventListener('mousemove', (e) => {
-  if (!mouseDown) return;
-  const dx = e.clientX - lastMouseX;
-  const dy = e.clientY - lastMouseY;
-  lastMouseX = e.clientX;
-  lastMouseY = e.clientY;
-  C3D.rotateY(dx * MOUSE_SENSITIVITY);
-  C3D.rotateX(dy * MOUSE_SENSITIVITY);
+  if (drawMode) {
+    if (!drawing) return;
+    const x = e.clientX / RENDER_SCALE;
+    const y = e.clientY / RENDER_SCALE;
+    currentLine.push(screenToWorld(x, y, 0));
+  } else {
+    if (!mouseDown) return;
+    const dx = e.clientX - lastMouseX;
+    const dy = e.clientY - lastMouseY;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+    C3D.rotateY(dx * MOUSE_SENSITIVITY);
+    C3D.rotateX(dy * MOUSE_SENSITIVITY);
+  }
 });
 
 document.addEventListener('wheel', (e) => {
@@ -213,16 +258,26 @@ document.addEventListener('wheel', (e) => {
 
 document.addEventListener('touchstart', (e) => {
   if (e.target.closest('#model-select')) return;
-  if (e.touches.length === 1) {
-    mouseDown = true;
-    lastMouseX = e.touches[0].clientX;
-    lastMouseY = e.touches[0].clientY;
-  } else if (e.touches.length === 2) {
-    pinchStartDist = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-    pinchStartZoom = C3D.zoom;
+  if (drawMode) {
+    if (e.touches.length === 1) {
+      drawing = true;
+      const x = e.touches[0].clientX / RENDER_SCALE;
+      const y = e.touches[0].clientY / RENDER_SCALE;
+      currentLine = [screenToWorld(x, y, 0)];
+      userLines.push(currentLine);
+    }
+  } else {
+    if (e.touches.length === 1) {
+      mouseDown = true;
+      lastMouseX = e.touches[0].clientX;
+      lastMouseY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+      pinchStartDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      pinchStartZoom = C3D.zoom;
+    }
   }
   // Prevent the browser from handling gestures like double tap to zoom
   e.preventDefault();
@@ -230,30 +285,46 @@ document.addEventListener('touchstart', (e) => {
 
 document.addEventListener('touchmove', (e) => {
   if (e.target.closest('#model-select')) return;
-  if (e.touches.length === 1 && mouseDown) {
-    const touch = e.touches[0];
-    const dx = touch.clientX - lastMouseX;
-    const dy = touch.clientY - lastMouseY;
-    lastMouseX = touch.clientX;
-    lastMouseY = touch.clientY;
-    C3D.rotateY(dx * MOUSE_SENSITIVITY);
-    C3D.rotateX(dy * MOUSE_SENSITIVITY);
-  } else if (e.touches.length === 2) {
-    const dist = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-    const delta = dist - pinchStartDist;
-    // Scale pinch zoom much more aggressively so it matches mouse wheel zoom
-    C3D.setZoom(pinchStartZoom + delta * 0.01 * 100);
+  if (drawMode) {
+    if (drawing && e.touches.length === 1) {
+      const touch = e.touches[0];
+      const x = touch.clientX / RENDER_SCALE;
+      const y = touch.clientY / RENDER_SCALE;
+      currentLine.push(screenToWorld(x, y, 0));
+    }
+  } else {
+    if (e.touches.length === 1 && mouseDown) {
+      const touch = e.touches[0];
+      const dx = touch.clientX - lastMouseX;
+      const dy = touch.clientY - lastMouseY;
+      lastMouseX = touch.clientX;
+      lastMouseY = touch.clientY;
+      C3D.rotateY(dx * MOUSE_SENSITIVITY);
+      C3D.rotateX(dy * MOUSE_SENSITIVITY);
+    } else if (e.touches.length === 2) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const delta = dist - pinchStartDist;
+      // Scale pinch zoom much more aggressively so it matches mouse wheel zoom
+      C3D.setZoom(pinchStartZoom + delta * 0.01 * 100);
+    }
   }
   e.preventDefault();
 }, { passive: false });
 
 document.addEventListener('touchend', (e) => {
   if (e.target.closest('#model-select')) return;
-  if (e.touches.length === 0) {
-    mouseDown = false;
+  if (drawMode) {
+    if (e.touches.length === 0) {
+      drawing = false;
+      currentLine = null;
+    }
+  } else {
+    if (e.touches.length === 0) {
+      mouseDown = false;
+    }
   }
   // Make sure the current zoom persists after the gesture ends
   pinchStartZoom = C3D.zoom;
@@ -263,6 +334,10 @@ document.addEventListener('touchend', (e) => {
 
 document.addEventListener('touchcancel', (e) => {
   if (e.target.closest('#model-select')) return;
+  if (drawMode) {
+    drawing = false;
+    currentLine = null;
+  }
   mouseDown = false;
   pinchStartZoom = C3D.zoom;
   e.preventDefault();
@@ -354,7 +429,7 @@ try {
 
 
     C3D.completeScreenDraw({
-      lines: currentLines,
+      lines: currentLines.concat(userLines),
       points: arr,
       showStats: false
     })
@@ -430,6 +505,7 @@ const updateModel = () => {
 };
 
 modelSelect.addEventListener('change', updateModel);
+drawToggleBtn.addEventListener('click', toggleDrawMode);
 updateModel();
 
 setInterval(updatePoints, 15);
