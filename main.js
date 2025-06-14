@@ -257,7 +257,7 @@ document.addEventListener('wheel', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchstart', (e) => {
-  if (e.target.closest('#model-select')) return;
+  if (e.target.closest('#model-select') || e.target.closest('#draw-toggle')) return;
   if (drawMode) {
     if (e.touches.length === 1) {
       drawing = true;
@@ -284,7 +284,7 @@ document.addEventListener('touchstart', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchmove', (e) => {
-  if (e.target.closest('#model-select')) return;
+  if (e.target.closest('#model-select') || e.target.closest('#draw-toggle')) return;
   if (drawMode) {
     if (drawing && e.touches.length === 1) {
       const touch = e.touches[0];
@@ -315,7 +315,7 @@ document.addEventListener('touchmove', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchend', (e) => {
-  if (e.target.closest('#model-select')) return;
+  if (e.target.closest('#model-select') || e.target.closest('#draw-toggle')) return;
   if (drawMode) {
     if (e.touches.length === 0) {
       drawing = false;
@@ -333,7 +333,7 @@ document.addEventListener('touchend', (e) => {
 }, { passive: false });
 
 document.addEventListener('touchcancel', (e) => {
-  if (e.target.closest('#model-select')) return;
+  if (e.target.closest('#model-select') || e.target.closest('#draw-toggle')) return;
   if (drawMode) {
     drawing = false;
     currentLine = null;
