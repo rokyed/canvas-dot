@@ -176,7 +176,7 @@ export default class Canvas3D {
 
   shadeColorByDistance(color, distance) {
     const rgb = this.parseColor(color);
-    const factor = 1 / (1 + distance * 0.05);
+    const factor = 1 / (1 + distance * 0.08);
     const r = Math.round(rgb.r * factor);
     const g = Math.round(rgb.g * factor);
     const b = Math.round(rgb.b * factor);
@@ -185,8 +185,7 @@ export default class Canvas3D {
 
   drawLineSoftware(x,y, x2,y2, color, thickness = 1) {
     this.ctx.fillStyle = color;
-    let maxPoints = Math.max(Math.abs(x2-x), Math.abs(y2-y));
-    let diagLength = Math.sqrt(Math.pow(x2-x, 2) + Math.pow(y2-y, 2));
+    const diagLength = Math.sqrt(Math.pow(x2 - x, 2) + Math.pow(y2 - y, 2));
 
     for (let i = 0; i <= diagLength; i++) {
       const px = Math.round(this.lerp(x,x2,i/diagLength));
