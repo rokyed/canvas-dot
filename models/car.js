@@ -1,5 +1,28 @@
 import Point3D from '../point3d.js';
 
+function createWheel(radius = 0.5, width = 0.4, segments = 12) {
+  const pts = [];
+  for (let i = 0; i < segments; i++) {
+    const angle = (i / segments) * Math.PI * 2;
+    const y = radius * Math.cos(angle);
+    const z = radius * Math.sin(angle);
+    pts.push(new Point3D(-width / 2, y, z));
+    pts.push(new Point3D(width / 2, y, z));
+  }
+  const lines = [];
+  for (let i = 0; i < segments; i++) {
+    const next = (i + 1) % segments;
+    const aF = pts[i * 2];
+    const aB = pts[i * 2 + 1];
+    const bF = pts[next * 2];
+    const bB = pts[next * 2 + 1];
+    lines.push([aF, bF]);
+    lines.push([aB, bB]);
+    lines.push([aF, aB]);
+  }
+  return { points: pts, lines };
+}
+
 export function createCar() {
   const bodyWidth = 4;
   const bodyHeight = 1;
@@ -32,7 +55,22 @@ export function createCar() {
     new Point3D(-roofWidth / 2, roofHeight, -roofDepth / 2)
   ];
 
-  const points = [...bottom, ...top, ...roof];
+  const wheelRadius = 0.5;
+  const wheelWidth = 0.4;
+  const wheelOffsetX = bodyWidth / 2 - wheelWidth / 2;
+  const wheelOffsetZ = bodyDepth / 2;
+  const wheelOffsetY = -wheelRadius;
+
+  const { points: flp, lines: fll } = createWheel(wheelRadius, wheelWidth);
+  flp.forEach(p => p.translate(-wheelOffsetX, wheelOffsetY, wheelOffsetZ));
+  const { points: frp, lines: frl } = createWheel(wheelRadius, wheelWidth);
+  frp.forEach(p => p.translate(wheelOffsetX, wheelOffsetY, wheelOffsetZ));
+  const { points: blp, lines: bll } = createWheel(wheelRadius, wheelWidth);
+  blp.forEach(p => p.translate(-wheelOffsetX, wheelOffsetY, -wheelOffsetZ));
+  const { points: brp, lines: brl } = createWheel(wheelRadius, wheelWidth);
+  brp.forEach(p => p.translate(wheelOffsetX, wheelOffsetY, -wheelOffsetZ));
+
+  const points = [...bottom, ...top, ...roof, ...flp, ...frp, ...blp, ...brp];
 
   const lines = [
     // Body base
@@ -61,6 +99,8 @@ export function createCar() {
     [points[6], points[10]],
     [points[7], points[11]]
   ];
+
+  lines.push(...fll, ...frl, ...bll, ...brl);
 
   points.forEach(p => p.setColor('#fff'));
 
