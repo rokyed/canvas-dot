@@ -1,5 +1,12 @@
 import Point3D from '../point3d.js';
 
+function rotatePointsY(points, angle, cx = 0, cy = 0, cz = 0) {
+  points.forEach(p => {
+    const rot = p.rotateAroundY(p.x - cx, p.y - cy, p.z - cz, angle);
+    p.setPosition(rot.x + cx, rot.y + cy, rot.z + cz);
+  });
+}
+
 function createWheel(radius = 0.5, width = 0.4, segments = 12) {
   const pts = [];
   for (let i = 0; i < segments; i++) {
@@ -63,12 +70,16 @@ export function createCar() {
 
   const { points: flp, lines: fll } = createWheel(wheelRadius, wheelWidth);
   flp.forEach(p => p.translate(-wheelOffsetX, wheelOffsetY, wheelOffsetZ));
+  rotatePointsY(flp, 90, -wheelOffsetX, wheelOffsetY, wheelOffsetZ);
   const { points: frp, lines: frl } = createWheel(wheelRadius, wheelWidth);
   frp.forEach(p => p.translate(wheelOffsetX, wheelOffsetY, wheelOffsetZ));
+  rotatePointsY(frp, 90, wheelOffsetX, wheelOffsetY, wheelOffsetZ);
   const { points: blp, lines: bll } = createWheel(wheelRadius, wheelWidth);
   blp.forEach(p => p.translate(-wheelOffsetX, wheelOffsetY, -wheelOffsetZ));
+  rotatePointsY(blp, 90, -wheelOffsetX, wheelOffsetY, -wheelOffsetZ);
   const { points: brp, lines: brl } = createWheel(wheelRadius, wheelWidth);
   brp.forEach(p => p.translate(wheelOffsetX, wheelOffsetY, -wheelOffsetZ));
+  rotatePointsY(brp, 90, wheelOffsetX, wheelOffsetY, -wheelOffsetZ);
 
   const points = [...bottom, ...top, ...roof, ...flp, ...frp, ...blp, ...brp];
 
