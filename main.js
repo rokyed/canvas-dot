@@ -429,6 +429,9 @@ const raf = (timestamp) => {
   if (modelSelect.value === 'knot') {
     updateKnot(delta);
   }
+  if (modelSelect.value === 'car') {
+    updateCar(delta);
+  }
 
 try {
   C3D.settings.occlusion = enableOcclusion;
@@ -488,7 +491,7 @@ const { points: heartPoints, lines: heartLines } = createHeart();
 const { points: pyramidPoints, lines: pyramidLines } = createPyramid(2, 2);
 const { points: pendulumPoints, lines: pendulumLines, update: updatePendulum } = createPendulum(4, 1);
 const { points: knotPoints, lines: knotLines, update: updateKnot } = createKnot();
-const { points: carPoints, lines: carLines } = createCar();
+const { points: carPoints, lines: carLines, update: updateCar } = createCar();
 
 let currentLines = swordLines;
 
