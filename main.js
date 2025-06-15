@@ -160,6 +160,13 @@ const toggleStats = () => {
 const toggleDrawMode = () => {
   drawMode = !drawMode;
   drawToggleBtn.textContent = drawMode ? 'Draw: On' : 'Draw: Off';
+  if (!drawMode && drawing) {
+    drawing = false;
+    if (currentLine && currentLine.length < 2) {
+      userLines.pop();
+    }
+    currentLine = null;
+  }
 };
 
 const screenToWorld = (sx, sy, planeZ = 0) => {
