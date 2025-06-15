@@ -15,6 +15,7 @@ export default class Canvas3D {
   lineWidthScale = 0.05;
   worldRotation = new Point3D(0,0,0);
   stats = {};
+  colorCtx = null;
   settings = {
     occlusion: true,
     batch: false,
@@ -27,6 +28,7 @@ export default class Canvas3D {
     this.height = height;
     this.zoom = zoom || 1;
     this.cameraPoint =  new Point3D(width/2,height/2, 0);
+    this.colorCtx = document.createElement('canvas').getContext('2d');
     this.initCanvas();
     this.initScreen(width, height, scale);
   }
@@ -84,21 +86,8 @@ export default class Canvas3D {
       if (clearScreen)
         this.clearScreen();
 
-      let colors = {};
-
       for (let i = 0; i < points.length; i++) {
-        if (!colors[points[i].color]) {
-          colors[points[i].color] = [];
-        }
-
-        colors[points[i].color].push(points[i]);
-      }
-
-      for (let k in colors) {
-        this.ctx.fillStyle = k;
-        for (let i = 0; i < colors[k].length; i++) {
-          this.drawPointNoColor(colors[k][i]);
-        }
+        this.drawPoint(points[i]);
       }
   }
 
@@ -143,10 +132,12 @@ export default class Canvas3D {
     const scaleB = pointB.getScale(this.worldRotation, this.zoom);
     const thickness = Math.max(1, ((scaleA + scaleB) / 2) * this.lineWidthScale);
     this.stats.drawnLines ++;
+    const dist = (pointA.getDistanceFromCamera(this.worldRotation) + pointB.getDistanceFromCamera(this.worldRotation)) / 2;
+    const color = this.shadeColorByDistance(pointA.color, dist);
     if (this.settings.hwLines) {
-      this.drawLineHardware(pA.x,pA.y, pB.x, pB.y, pointA.color);
+      this.drawLineHardware(pA.x,pA.y, pB.x, pB.y, color);
     } else {
-      this.drawLineSoftware(pA.x,pA.y, pB.x, pB.y, pointA.color, thickness);
+      this.drawLineSoftware(pA.x,pA.y, pB.x, pB.y, color, thickness);
     }
   }
 
@@ -159,6 +150,37 @@ export default class Canvas3D {
   }
   lerp(a,b,x) {
     return a + ((b-a)* x);
+  }
+
+  parseColor(color) {
+    this.colorCtx.fillStyle = color;
+    const computed = this.colorCtx.fillStyle;
+    if (computed.startsWith('#')) {
+      let hex = computed.slice(1);
+      if (hex.length === 3) {
+        hex = hex.split('').map(ch => ch + ch).join('');
+      }
+      const num = parseInt(hex, 16);
+      return {
+        r: (num >> 16) & 255,
+        g: (num >> 8) & 255,
+        b: num & 255
+      };
+    }
+    const m = computed.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (m) {
+      return { r: +m[1], g: +m[2], b: +m[3] };
+    }
+    return { r: 0, g: 0, b: 0 };
+  }
+
+  shadeColorByDistance(color, distance) {
+    const rgb = this.parseColor(color);
+    const factor = 1 / (1 + distance * 0.05);
+    const r = Math.round(rgb.r * factor);
+    const g = Math.round(rgb.g * factor);
+    const b = Math.round(rgb.b * factor);
+    return `rgb(${r},${g},${b})`;
   }
 
   drawLineSoftware(x,y, x2,y2, color, thickness = 1) {
@@ -179,6 +201,8 @@ export default class Canvas3D {
     if (point.isBehindCamera(this.worldRotation)) {
       return;
     }
+    const dist = point.getDistanceFromCamera(this.worldRotation);
+    this.ctx.fillStyle = this.shadeColorByDistance(point.color, dist);
     this.stats.drawnPoints ++;
     let p2d = point.getRotated2D(this.worldRotation, this.zoom);
     let size = point.getScale(this.worldRotation, this.zoom) * this.pointSizeScale;
@@ -195,7 +219,6 @@ export default class Canvas3D {
   }
 
   drawPoint(point) {
-    this.ctx.fillStyle = point.color;
     this.drawPointNoColor(point);
   }
 
