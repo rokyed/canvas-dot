@@ -66,7 +66,8 @@ export function createCar() {
   const wheelWidth = 0.4;
   const wheelOffsetX = bodyWidth / 2 - wheelWidth / 2;
   const wheelOffsetZ = bodyDepth / 2;
-  const wheelOffsetY = -wheelRadius;
+  // Raise the wheels upwards by their radius
+  const wheelOffsetY = 0;
 
   const { points: flp, lines: fll } = createWheel(wheelRadius, wheelWidth);
   flp.forEach(p => p.translate(-wheelOffsetX, wheelOffsetY, wheelOffsetZ));
