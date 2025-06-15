@@ -10,7 +10,7 @@ It's made with plain new JS.
 - Mouse wheel to zoom in and out.
 - Touch drag to rotate the view.
 - Pinch to zoom in and out on touch screens.
-- Choose between several 3D models like sword, cube, sphere, star, pyramid, the new heart and knot.
+- Choose between several 3D models like sword, cube, sphere, star, pyramid, pendulum, the new heart, knot and car.
 - Points and lines are now rendered in proper depth order.
 - Objects behind the camera are never rendered.
 - Lines can now be defined using multiple points for a continuous path.
