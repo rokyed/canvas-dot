@@ -7,6 +7,13 @@ function rotatePointsY(points, angle, cx = 0, cy = 0, cz = 0) {
   });
 }
 
+function rotatePointsX(points, angle, cx = 0, cy = 0, cz = 0) {
+  points.forEach(p => {
+    const rot = p.rotateAroundX(p.x - cx, p.y - cy, p.z - cz, angle);
+    p.setPosition(rot.x + cx, rot.y + cy, rot.z + cz);
+  });
+}
+
 function rotatePointsZ(points, angle, cx = 0, cy = 0, cz = 0) {
   points.forEach(p => {
     const rot = p.rotateAroundZ(p.x - cx, p.y - cy, p.z - cz, angle);
@@ -84,25 +91,28 @@ export function createCar() {
 
   const { points: flp, lines: fll } = createWheel(wheelRadius, wheelWidth);
   flp.forEach(p => p.translate(-wheelOffsetX, wheelOffsetY, wheelOffsetZ));
-  rotatePointsY(flp, 90, -wheelOffsetX, wheelOffsetY, wheelOffsetZ);
   const { points: frp, lines: frl } = createWheel(wheelRadius, wheelWidth);
   frp.forEach(p => p.translate(wheelOffsetX, wheelOffsetY, wheelOffsetZ));
-  rotatePointsY(frp, 90, wheelOffsetX, wheelOffsetY, wheelOffsetZ);
   const { points: blp, lines: bll } = createWheel(wheelRadius, wheelWidth);
   blp.forEach(p => p.translate(-wheelOffsetX, wheelOffsetY, -wheelOffsetZ));
-  rotatePointsY(blp, 90, -wheelOffsetX, wheelOffsetY, -wheelOffsetZ);
   const { points: brp, lines: brl } = createWheel(wheelRadius, wheelWidth);
   brp.forEach(p => p.translate(wheelOffsetX, wheelOffsetY, -wheelOffsetZ));
-  rotatePointsY(brp, 90, wheelOffsetX, wheelOffsetY, -wheelOffsetZ);
 
   const headlightLeft = new Point3D(-bodyWidth / 4, bodyHeight * 0.5, wheelOffsetZ + 0.1);
   const headlightRight = new Point3D(bodyWidth / 4, bodyHeight * 0.5, wheelOffsetZ + 0.1);
   const stoplightLeft = new Point3D(-bodyWidth / 4, bodyHeight * 0.5, -wheelOffsetZ - 0.1);
   const stoplightRight = new Point3D(bodyWidth / 4, bodyHeight * 0.5, -wheelOffsetZ - 0.1);
 
-  const bodyPoints = [...bottom, ...top, ...roof, ...flp, ...frp, ...blp, ...brp];
-  const points = [...bodyPoints,
-                   headlightLeft, headlightRight, stoplightLeft, stoplightRight];
+  const bodyPoints = [...bottom, ...top, ...roof];
+  const wheelPoints = [...flp, ...frp, ...blp, ...brp];
+  const points = [
+    ...bodyPoints,
+    ...wheelPoints,
+    headlightLeft,
+    headlightRight,
+    stoplightLeft,
+    stoplightRight
+  ];
 
   const lines = [
     // Body base
@@ -135,6 +145,7 @@ export function createCar() {
   lines.push(...fll, ...frl, ...bll, ...brl);
 
   points.forEach(p => p.setColor('#fff'));
+  wheelPoints.forEach(p => p.setColor('#fff'));
   headlightLeft.setColor('#ff0');
   headlightRight.setColor('#ff0');
   stoplightLeft.setColor('#f00');
@@ -163,10 +174,10 @@ export function createCar() {
       colorTimer = 0;
     }
     const spinDelta = 360 * delta;
-    rotatePointsZ(flp, spinDelta, wheelCenters.fl.x, wheelCenters.fl.y + suspension.fl, wheelCenters.fl.z);
-    rotatePointsZ(frp, spinDelta, wheelCenters.fr.x, wheelCenters.fr.y + suspension.fr, wheelCenters.fr.z);
-    rotatePointsZ(blp, spinDelta, wheelCenters.bl.x, wheelCenters.bl.y + suspension.bl, wheelCenters.bl.z);
-    rotatePointsZ(brp, spinDelta, wheelCenters.br.x, wheelCenters.br.y + suspension.br, wheelCenters.br.z);
+    rotatePointsX(flp, spinDelta, wheelCenters.fl.x, wheelCenters.fl.y + suspension.fl, wheelCenters.fl.z);
+    rotatePointsX(frp, spinDelta, wheelCenters.fr.x, wheelCenters.fr.y + suspension.fr, wheelCenters.fr.z);
+    rotatePointsX(blp, spinDelta, wheelCenters.bl.x, wheelCenters.bl.y + suspension.bl, wheelCenters.bl.z);
+    rotatePointsX(brp, spinDelta, wheelCenters.br.x, wheelCenters.br.y + suspension.br, wheelCenters.br.z);
 
     const newSteer = Math.sin(time * 2) * 30;
     rotatePointsY(flp, newSteer - steerAngle, wheelCenters.fl.x, wheelCenters.fl.y + suspension.fl, wheelCenters.fl.z);
