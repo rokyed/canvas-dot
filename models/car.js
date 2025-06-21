@@ -100,7 +100,8 @@ export function createCar() {
   const stoplightLeft = new Point3D(-bodyWidth / 4, bodyHeight * 0.5, -wheelOffsetZ - 0.1);
   const stoplightRight = new Point3D(bodyWidth / 4, bodyHeight * 0.5, -wheelOffsetZ - 0.1);
 
-  const points = [...bottom, ...top, ...roof, ...flp, ...frp, ...blp, ...brp,
+  const bodyPoints = [...bottom, ...top, ...roof, ...flp, ...frp, ...blp, ...brp];
+  const points = [...bodyPoints,
                    headlightLeft, headlightRight, stoplightLeft, stoplightRight];
 
   const lines = [
@@ -149,9 +150,18 @@ export function createCar() {
   const suspension = { fl: 0, fr: 0, bl: 0, br: 0 };
   let steerAngle = 0;
   let time = 0;
+  let colorTimer = 0;
+
+  const randomColor = () => '#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0');
 
   const update = (delta) => {
     time += delta;
+    colorTimer += delta;
+    if (colorTimer >= 0.1) {
+      const c = randomColor();
+      bodyPoints.forEach(p => p.setColor(c));
+      colorTimer = 0;
+    }
     const spinDelta = 360 * delta;
     rotatePointsZ(flp, spinDelta, wheelCenters.fl.x, wheelCenters.fl.y + suspension.fl, wheelCenters.fl.z);
     rotatePointsZ(frp, spinDelta, wheelCenters.fr.x, wheelCenters.fr.y + suspension.fr, wheelCenters.fr.z);
